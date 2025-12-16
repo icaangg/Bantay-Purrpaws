@@ -132,7 +132,12 @@ app.add_middleware(
 )
 
 # Password hasher
-pwd_context = CryptContext(schemes=["bcrypt", "pbkdf2_sha256"], deprecated="auto")
+# Use pbkdf2_sha256 as the primary scheme to avoid bcrypt's 72-byte limit, but
+# keep bcrypt for existing hashes.
+pwd_context = CryptContext(
+    schemes=["pbkdf2_sha256", "bcrypt"],
+    deprecated="auto",
+)
 
 # Simple in-memory rate limiter for auth endpoints (per-IP)
 LOGIN_ATTEMPTS = {}
