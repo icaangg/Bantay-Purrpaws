@@ -1295,7 +1295,15 @@ def read_admin_users(request: Request):
     user_role, current_user = resolve_user(request)
     if user_role != 'admin':
         return RedirectResponse(url="/login?error=Admin access required.", status_code=HTTP_303_SEE_OTHER)
-    return templates.TemplateResponse("admin_users.html", {"request": request, "user_role": user_role, "users": users}) 
+    return templates.TemplateResponse(
+        "admin_users.html",
+        {
+            "request": request,
+            "user_role": user_role,
+            "current_user": current_user,
+            "users": users,
+        },
+    )
 
 
 @app.get("/admin/export/pets.csv", tags=["Admin Panel"])
@@ -1521,7 +1529,13 @@ def read_admin_exports(request: Request):
     user_role, current_user = resolve_user(request)
     if user_role != 'admin':
         return RedirectResponse(url="/login?error=Admin access required.", status_code=HTTP_303_SEE_OTHER)
-    context = {"request": request, "user_role": user_role, "exports": exports, "scheduled": scheduled_exports}
+    context = {
+        "request": request,
+        "user_role": user_role,
+        "current_user": current_user,
+        "exports": exports,
+        "scheduled": scheduled_exports,
+    }
     return templates.TemplateResponse("admin_exports.html", context)
 
 
@@ -1628,6 +1642,7 @@ def read_admin_pending(request: Request):
 
     context = {
         "request": request,
+        "current_user": current_user,
         "pending_regs": pending_regs,
         "info_regs": info_regs,
         "approved_regs": approved_regs,
