@@ -1069,6 +1069,7 @@ def read_admin_dashboard(request: Request):
     context = {
         "request": request,
         "user_role": user_role,
+        "current_user": current_user,
         "stats": {
             "total_registered": total_registered,
             "total_verified": total_verified,

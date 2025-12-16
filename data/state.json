@@ -89,6 +89,24 @@
       "gender": "male",
       "profile_photo_url": "/static/uploads/579c1161-20eb-463a-96ab-2cb0c48c9635.jpg",
       "mobile_number": "09925240493"
+    },
+    {
+      "user_id": "24ca3962-c343-4e72-b079-1f68f142cb91",
+      "full_name": "Jessica Sales",
+      "email": "jessica.sales.evsu@gmail.com",
+      "password": "$pbkdf2-sha256$29000$LAXAuJdSyvkfYyzFuBfifA$.CCTNtz4wzgzEOikRVz4BW8kZXqdycFIaTtuuZmW8L4",
+      "role": "user",
+      "birthday": "2003-10-24",
+      "address": "Brgy. Linao, Purok 2\r\nPurok CCF, Brgy. Linao, Ormoc City",
+      "contact_info": "+639205343636",
+      "notifications_enabled": true,
+      "privacy_public": true,
+      "first_name": "Jessica",
+      "middle_name": null,
+      "last_name": "Sales",
+      "gender": "female",
+      "profile_photo_url": null,
+      "mobile_number": "+639205343636"
     }
   ],
   "pending_reports": [],
@@ -170,7 +188,8 @@
     "Announcement 'Vaccination Drive' created by admin.",
     "Registered pet 'Luna' (owner: Jessica Sales) pending review.",
     "Approved 'Luna' (3eb3e411-2637-419d-9bc2-f419c1397d03).",
-    "Notification added for user 95997287-fcac-49f1-91f0-d3423bf749e5: Your case/pet 'Luna' has been approved by admin."
+    "Notification added for user 95997287-fcac-49f1-91f0-d3423bf749e5: Your case/pet 'Luna' has been approved by admin.",
+    "New user registered: Jessica Sales (jessica.sales.evsu@gmail.com)"
   ],
   "notifications": [
     {
