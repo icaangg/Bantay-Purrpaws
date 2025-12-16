@@ -355,6 +355,18 @@ body {
     background: var(--bg-light);
 }
 
+/* Admin pending lists: horizontal card layout */
+.card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: flex-start;
+}
+
+.card-grid .pet-card {
+    width: min(320px, 100%);
+}
+
 .pet-card-body {
     padding: 1.25rem;
     flex-grow: 1;
