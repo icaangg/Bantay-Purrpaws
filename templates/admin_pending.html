@@ -71,12 +71,12 @@
     {% if pending_regs %}
         <div class="card-grid">
             {% for pet in pending_regs %}
-            <div class="pet-card" id="card-{{ pet.pet_id }}">
+            <div class="pet-card" id="card-{{ pet.pet_id }}" style="max-width: 340px; margin: 0 auto;">
                 <div class="pet-card-header">
                     <span>By {{ 'Reporter' if pet.is_stray else 'Owner' }}</span>
                     <span>{{ pet.pet_id.hex[:8] }}...</span>
                 </div>
-                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}" style="height: 150px; object-fit: cover;">
                 <div class="pet-card-body" id="body-{{ pet.pet_id }}">
                     <div class="pill {% if pet.is_stray %}stray{% else %}owned{% endif %}">{% if pet.is_stray %}Stray Report{% else %}Owned Pet{% endif %}</div>
                     <h3>{{ pet.name }}</h3>
@@ -134,9 +134,6 @@
                                 Deny
                             </button>
                         </form>
-                            <button type="button" class="btn btn-sm cta-secondary" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="{{ pet.owner_name or '' }}" data-contact="{{ pet.owner_contact or pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
-                            Details
-                        </button>
                     </div>
                 </div>
             </div>
@@ -153,12 +150,12 @@
     {% if info_regs %}
         <div class="card-grid">
             {% for pet in info_regs %}
-            <div class="pet-card" id="card-{{ pet.pet_id }}">
+            <div class="pet-card" id="card-{{ pet.pet_id }}" style="max-width: 340px; margin: 0 auto;">
                 <div class="pet-card-header">
                     <span>By Owner</span>
                     <span>{{ pet.pet_id.hex[:8] }}...</span>
                 </div>
-                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}" style="height: 150px; object-fit: cover;">
                 <div class="pet-card-body" id="body-{{ pet.pet_id }}">
                     <div class="pill owned">Owned Pet</div>
                     <h3>{{ pet.name }}</h3>
@@ -183,9 +180,6 @@
                                 Resolve
                             </button>
                         </form>
-                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="{{ pet.owner_name or '' }}" data-contact="{{ pet.owner_contact or '' }}" data-id="{{ pet.pet_id }}">
-                            Details
-                        </button>
                     </div>
                 </div>
             </div>
@@ -201,12 +195,12 @@
     {% if approved_regs %}
         <div class="card-grid">
             {% for pet in approved_regs %}
-            <div class="pet-card" id="card-{{ pet.pet_id }}">
+            <div class="pet-card" id="card-{{ pet.pet_id }}" style="max-width: 340px; margin: 0 auto;">
                 <div class="pet-card-header">
                     <span>By Owner</span>
                     <span>{{ pet.pet_id.hex[:8] }}...</span>
                 </div>
-                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}" style="height: 150px; object-fit: cover;">
                 <div class="pet-card-body" id="body-{{ pet.pet_id }}">
                     <div class="pill owned">Owned Pet</div>
                     <h3>{{ pet.name }}</h3>
@@ -226,9 +220,6 @@
                                 Resolve
                             </button>
                         </form>
-                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="{{ pet.owner_name or '' }}" data-contact="{{ pet.owner_contact or '' }}" data-id="{{ pet.pet_id }}">
-                            Details
-                        </button>
                     </div>
                 </div>
             </div>
@@ -244,7 +235,7 @@
     {% if pending_lost_reports %}
         <div class="card-grid">
             {% for pet in pending_lost_reports %}
-            <div class="pet-card" id="card-{{ pet.pet_id }}">
+            <div class="pet-card" id="card-{{ pet.pet_id }}" style="max-width: 340px; margin: 0 auto;">
                 <div class="pet-card-header">
                     <span>By Reporter</span>
                     <span>{{ pet.pet_id.hex[:8] }}...</span>
@@ -306,9 +297,6 @@
                                 Deny
                             </button>
                         </form>
-                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="" data-contact="{{ pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
-                            Details
-                        </button>
                     </div>
                 </div>
             </div>
@@ -325,7 +313,7 @@
     {% if pending_found_reports %}
         <div class="card-grid">
             {% for pet in pending_found_reports %}
-            <div class="pet-card" id="card-{{ pet.pet_id }}">
+            <div class="pet-card" id="card-{{ pet.pet_id }}" style="max-width: 340px; margin: 0 auto;">
                 <div class="pet-card-header">
                     <span>By Reporter</span>
                     <span>{{ pet.pet_id.hex[:8] }}...</span>
@@ -381,9 +369,6 @@
                                 Deny
                             </button>
                         </form>
-                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="" data-contact="{{ pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
-                            Details
-                        </button>
                     </div>
                 </div>
             </div>
@@ -399,7 +384,7 @@
     {% if approved_reports %}
         <div class="card-grid">
             {% for pet in approved_reports %}
-            <div class="pet-card" id="card-{{ pet.pet_id }}">
+            <div class="pet-card" id="card-{{ pet.pet_id }}" style="max-width: 340px; margin: 0 auto;">
                 <div class="pet-card-header">
                     <span>By Reporter</span>
                     <span>{{ pet.pet_id.hex[:8] }}...</span>
@@ -425,9 +410,6 @@
                                 Resolve
                             </button>
                         </form>
-                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="" data-contact="{{ pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
-                            Details
-                        </button>
                     </div>
                 </div>
             </div>
@@ -443,7 +425,7 @@
     {% if resolved_reports %}
         <div class="card-grid">
             {% for pet in resolved_reports %}
-            <div class="pet-card" id="card-{{ pet.pet_id }}">
+            <div class="pet-card" id="card-{{ pet.pet_id }}" style="max-width: 340px; margin: 0 auto;">
                 <div class="pet-card-header">
                     <span>By Reporter</span>
                     <span>{{ pet.pet_id.hex[:8] }}...</span>
@@ -462,9 +444,6 @@
                 </div>
                 <div class="pet-card-footer" id="footer-{{ pet.pet_id }}">
                     <div class="card-actions">
-                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="" data-contact="{{ pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
-                            Details
-                        </button>
                     </div>
                 </div>
             </div>
