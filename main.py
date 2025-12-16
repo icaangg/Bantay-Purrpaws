@@ -857,15 +857,17 @@ def read_view_pets_page(request: Request):
     filter_breed = request.query_params.get("breed", "").lower()
     filter_color = request.query_params.get("color", "").lower()
     filter_location = request.query_params.get("location", "").lower()
+    search_performed = any([filter_breed, filter_color, filter_location])
 
     def matches(p: PetInDB) -> bool:
         return (filter_breed in p.breed.lower()) and (filter_color in p.color.lower()) and (filter_location in p.location_data.lower())
 
-    filtered = [p for p in approved_pets if matches(p)]
+    filtered = [p for p in approved_pets if matches(p)] if search_performed else []
     context = {
         "request": request,
         "pets": filtered,  # template expects 'pets'
         "user_role": user_role,
+        "search_performed": search_performed,
         "filters": {
             "breed": request.query_params.get("breed", ""),
             "color": request.query_params.get("color", ""),
@@ -1094,9 +1096,15 @@ def read_user_dashboard(request: Request):
     def owner_matches(p: PetInDB) -> bool:
         if not current_user:
             return False
-        return ((p.owner_name and p.owner_name == current_user.full_name) or
-                (p.owner_contact and current_user.contact_info and p.owner_contact == current_user.contact_info) or
-                (p.owner_contact and current_user.mobile_number and p.owner_contact == current_user.mobile_number))
+        # Prefer explicit linkage via owner_user_id
+        if getattr(p, "owner_user_id", None):
+            return str(p.owner_user_id) == str(current_user.user_id)
+        # Legacy fallback: match by contact info (not by name to avoid collisions)
+        return (
+            (p.owner_contact and current_user.contact_info and p.owner_contact == current_user.contact_info) or
+            (p.owner_contact and current_user.mobile_number and p.owner_contact == current_user.mobile_number) or
+            (p.owner_contact and current_user.email and p.owner_contact == current_user.email)
+        )
 
     user_pets = [p for p in (approved_pets + pending_pets) if owner_matches(p)]
 
