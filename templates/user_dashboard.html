@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard | Bantay PurrPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-override.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <a class="skip-link sr-only" href="#main-content">Skip to content</a>
+    
+    <div class="site-content-wrapper">
+        <header class="main-header">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <a href="/" class="navbar-brand">
+                        <img src="/static/purrpaws-logo.png" alt="Bantay PurrPaws Logo" class="navbar-brand-img">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="/report-animal">Report Animal</a></li>
+                        </ul>
+                        <div class="profile-dropdown-container">
+                            <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
+                                {{ current_user.full_name if current_user else 'User' }} ▾
+                            </button>
+                            <div class="profile-dropdown-content">
+                                <a href="/profile" class="dropdown-item">Edit Profile</a>
+                                <a href="/user/dashboard" class="dropdown-item">Dashboard</a>
+                                <a href="/notifications" class="dropdown-item">Notifications</a>
+                                <a href="/settings" class="dropdown-item">Settings</a>
+                                <a href="/support" class="dropdown-item">Support</a>
+                                <a href="/logout" class="dropdown-item">Log Out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main-content" class="content" tabindex="-1">
+            <div class="container my-4">
+                {% include 'partials/back_button.html' %}
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="text-primary mb-0">Dashboard</h1>
+                    <a href="/register" class="btn cta-primary d-none d-md-inline-block">+ Add New Pet</a>
+                </div>
+
+                <!-- Profile Summary -->
+                <section class="feature-box p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="text-primary mb-0">Profile Summary</h2>
+                        <a href="/profile" class="btn btn-sm cta-secondary">Edit Profile</a>
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-auto text-center mb-3 mb-md-0">
+                            {% if current_user.profile_photo_url %}
+                                <img src="{{ current_user.profile_photo_url }}" alt="Profile" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid var(--primary);">
+                            {% else %}
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; border: 3px solid var(--primary);">
+                                    <span class="fs-1">{{ current_user.full_name[0] if current_user.full_name else 'U' }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Full Name:</strong> {{ current_user.full_name }}</p>
+                                    <p class="mb-1"><strong>Email:</strong> {{ current_user.email }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Contact:</strong> {{ current_user.contact_info or current_user.mobile_number or 'N/A' }}</p>
+                                    <p class="mb-0"><strong>Status:</strong> <span class="badge bg-success">Verified</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Stats -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="dashboard-stat-card text-center" style="padding: 1.5rem;">
+                            <div class="stat-number">{{ user_pets|length }}</div>
+                            <div class="stat-label">My Pets</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="dashboard-stat-card text-center" style="padding: 1.5rem;">
+                            <div class="stat-number">{{ user_lost_reports|length }}</div>
+                            <div class="stat-label">Lost Reports</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="dashboard-stat-card text-center" style="padding: 1.5rem;">
+                            <div class="stat-number">{{ user_found_reports|length }}</div>
+                            <div class="stat-label">Found Reports</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="dashboard-stat-card text-center" style="padding: 1.5rem;">
+                            <div class="stat-number">{{ suggested_matches|length if suggested_matches else 0 }}</div>
+                            <div class="stat-label">Matches</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registered Pets -->
+                <section class="feature-box p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="text-primary mb-0">Registered Pets</h2>
+                        <a href="/register" class="btn btn-sm cta-primary">+ Add New Pet</a>
+                    </div>
+                    {% if user_pets %}
+                        <div class="row g-4">
+                            {% for pet in user_pets %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="pet-card">
+                                        {% if pet.photo_url %}
+                                            <img src="{{ pet.photo_url }}" alt="{{ pet.name }}">
+                                        {% else %}
+                                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                                <span style="font-size: 3rem;">🐾</span>
+                                            </div>
+                                        {% endif %}
+                                        <div class="pet-card-body">
+                                            <span class="badge bg-success mb-2">Owned Pet</span>
+                                            <h5 class="text-primary mb-2">{{ pet.name }}</h5>
+                                            <p class="text-muted mb-2 small">{{ pet.breed }} • {{ pet.color }}</p>
+                                            <div class="mb-2">
+                                                <small>Vaccinated: 
+                                                    {% if pet.vaccination_status %}
+                                                        <span class="badge bg-success">Yes</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning">Unknown</span>
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                            <div class="mb-3">
+                                                <small>Status: 
+                                                    {% if pet.status == 'approved' %}
+                                                        <span class="badge bg-success">Verified</span>
+                                                    {% elif pet.status == 'pending' %}
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">{{ pet.status }}</span>
+                                                    {% endif %}
+                                                </small>
+                                            </div>
+                                            <div class="d-flex gap-2 mt-auto">
+                                                <a href="/user/pet/edit?pet_id={{ pet.pet_id }}" class="btn btn-sm cta-secondary flex-fill">Edit</a>
+                                                <form method="POST" action="/user/pet/delete" class="flex-fill">
+                                                    <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                                                    <button class="btn btn-sm btn-danger w-100" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info text-center">
+                            <p class="mb-2">No registered pets yet.</p>
+                            <a href="/register" class="btn cta-primary">Add Your First Pet</a>
+                        </div>
+                    {% endif %}
+                </section>
+
+                <!-- Lost & Found Reports -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="feature-box p-4 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="text-primary mb-0">Lost Pet Reports</h3>
+                                <a href="/report-animal" class="btn btn-sm cta-primary">+ Report</a>
+                            </div>
+                            {% if user_lost_reports %}
+                                <div class="list-group">
+                                    {% for r in user_lost_reports %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="text-primary mb-1">{{ r.name }}</h6>
+                                                    <p class="mb-1 small text-muted">{{ r.location_data }}</p>
+                                                    <span class="badge 
+                                                        {% if r.status == 'approved' %}bg-success
+                                                        {% elif r.status == 'pending' %}bg-warning
+                                                        {% else %}bg-secondary{% endif %}">
+                                                        {{ r.status }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 d-flex gap-2">
+                                                <a href="/user/case/{{ r.pet_id }}" class="btn btn-sm cta-secondary">View</a>
+                                                <form method="POST" action="/user/report/delete" class="d-inline">
+                                                    <input type="hidden" name="report_id" value="{{ r.pet_id }}">
+                                                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">No lost reports submitted yet.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-box p-4 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="text-primary mb-0">Found Animal Reports</h3>
+                                <a href="/report-animal" class="btn btn-sm cta-primary">+ Report</a>
+                            </div>
+                            {% if user_found_reports %}
+                                <div class="list-group">
+                                    {% for r in user_found_reports %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="text-primary mb-1">{{ r.name }}</h6>
+                                                    <p class="mb-1 small text-muted">{{ r.location_data }}</p>
+                                                    <span class="badge 
+                                                        {% if r.status == 'approved' %}bg-success
+                                                        {% elif r.status == 'pending' %}bg-warning
+                                                        {% else %}bg-secondary{% endif %}">
+                                                        {{ r.status }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="mt-2 d-flex gap-2">
+                                                <a href="/user/case/{{ r.pet_id }}" class="btn btn-sm cta-secondary">View</a>
+                                                <form method="POST" action="/user/report/delete" class="d-inline">
+                                                    <input type="hidden" name="report_id" value="{{ r.pet_id }}">
+                                                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">No found reports submitted yet.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Suggested Matches -->
+                {% if suggested_matches %}
+                    <section class="feature-box p-4 mb-4">
+                        <h2 class="text-primary mb-3">Suggested Matches</h2>
+                        {% for lost_id, matches in suggested_matches.items() %}
+                            <div class="card mb-3 border-0 shadow-sm">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Matches for {{ suggestions_map[lost_id].name }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        {% for m in matches %}
+                                            <div class="col-md-6">
+                                                <div class="card border">
+                                                    {% if m.photo_url %}
+                                                        <img src="{{ m.photo_url }}" alt="{{ m.name }}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                                                    {% endif %}
+                                                    <div class="card-body">
+                                                        <h6 class="text-primary">{{ m.name }}</h6>
+                                                        <p class="mb-1 small"><strong>Breed:</strong> {{ m.breed }}</p>
+                                                        <p class="mb-1 small"><strong>Color:</strong> {{ m.color }}</p>
+                                                        <p class="mb-2 small"><strong>Location:</strong> {{ m.location_data }}</p>
+                                                        <a href="/user/case/{{ m.pet_id }}" class="btn btn-sm cta-primary">View Case</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+
+                <!-- Notifications & Announcements -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="feature-box p-4 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="text-primary mb-0">Notifications</h3>
+                                <a href="/notifications" class="btn btn-sm cta-secondary">View All</a>
+                            </div>
+                            {% if notifications %}
+                                <div class="list-group">
+                                    {% for n in notifications[:5] %}
+                                        <div class="list-group-item">
+                                            <p class="mb-0 small">{{ n }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">No new notifications.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-box p-4 h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="text-primary mb-0">Announcements</h3>
+                                <a href="/announcements" class="btn btn-sm cta-secondary">View All</a>
+                            </div>
+                            {% if announcements %}
+                                <div class="list-group">
+                                    {% for a in announcements %}
+                                        <div class="list-group-item">
+                                            <h6 class="mb-1 fw-bold">{{ a.title if a.title else a }}</h6>
+                                            <p class="mb-0 small">{{ a.content if a.content else a }}</p>
+                                            <small class="text-muted">{{ a.created_at[:10] if a.created_at else '' }}</small>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">No announcements.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <section class="feature-box p-4 mb-4">
+                    <h2 class="text-primary mb-3">Search Community Reports</h2>
+                    <form method="GET" action="/view-all-pets" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="ud-breed" class="form-label">Breed</label>
+                            <input type="text" class="form-control" id="ud-breed" name="breed" placeholder="Breed" value="{{ filters.breed if filters else '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ud-color" class="form-label">Color</label>
+                            <input type="text" class="form-control" id="ud-color" name="color" placeholder="Color" value="{{ filters.color if filters else '' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="ud-location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="ud-location" name="location" placeholder="Location" value="{{ filters.location if filters else '' }}">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn cta-primary">Search</button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Support -->
+                <section class="feature-box p-4 mb-4">
+                    <h2 class="text-primary mb-3">Support & Help</h2>
+                    <p class="mb-3">If you need help, submit a support ticket or review our FAQs.</p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="/support" class="btn cta-primary">Submit Support Ticket</a>
+                        <a href="/support" class="btn cta-secondary">View FAQs</a>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row py-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="footer-contact">
+                        <a href="tel:(414) 857-0107" class="text-white text-decoration-none me-3">📞 (414) 857 - 0107</a>
+                        <a href="mailto:report@purrpaws.com" class="text-white text-decoration-none">📧 report@purrpaws.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-copyright">
+                        <p class="mb-0">&copy; 2025 Bantay PurrPaws. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('click', function(e){
+            const btn = e.target.closest('.profile-main-link');
+            if(btn){
+                const container = btn.closest('.profile-dropdown-container');
+                const isOpen = container.classList.toggle('open');
+                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                e.preventDefault();
+            } else {
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape'){
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

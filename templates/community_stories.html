@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Stories | Bantay PurrPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-override.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <a class="skip-link sr-only" href="#main-content">Skip to content</a>
+
+    <div class="site-content-wrapper">
+        <header class="main-header">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <a href="/" class="navbar-brand">
+                        <img src="/static/purrpaws-logo.png" alt="Bantay PurrPaws Logo" class="navbar-brand-img">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/report-animal">Report Animal</a></li>
+                        </ul>
+                        <div class="profile-dropdown-container">
+                            <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
+                                {% if user_role != 'guest' %}
+                                    {{ current_user.full_name if current_user else 'User' }} ▾
+                                {% else %}
+                                    Profile ▾
+                                {% endif %}
+                            </button>
+                            <div class="profile-dropdown-content">
+                                {% if user_role != 'guest' %}
+                                    <a href="/logout" class="dropdown-item">Log Out</a>
+                                    <a href="/user/dashboard" class="dropdown-item">Dashboard</a>
+                                {% else %}
+                                    <a href="/login" class="dropdown-item">Login</a>
+                                    <a href="/user-register" class="dropdown-item">Register</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main-content" class="content" tabindex="-1">
+            <div class="container my-4">
+                {% include 'partials/back_button.html' %}
+                <div class="text-center mb-4">
+                    <h1 class="text-primary mb-2">Community Stories</h1>
+                    <p class="text-muted">Share your experience and help us improve the system</p>
+                </div>
+
+                {% if request.query_params.get('status') == 'submitted' %}
+                    <div class="alert alert-success">Thank you for your feedback!</div>
+                {% endif %}
+                {% if request.query_params.get('error') %}
+                    <div class="alert alert-danger">{{ request.query_params.get('error') }}</div>
+                {% endif %}
+
+                {% if user_role != 'guest' %}
+                    <div class="feature-box p-4 mb-4">
+                        <h3 class="text-primary mb-3">Share Your Experience</h3>
+                        <form method="POST" action="/community-stories/submit">
+                            <div class="mb-3">
+                                <label for="rating" class="form-label">Rate Your Experience <span class="text-danger">*</span></label>
+                                <select class="form-select" id="rating" name="rating" required>
+                                    <option value="">Select Rating</option>
+                                    <option value="5">⭐⭐⭐⭐⭐ Excellent (5 stars)</option>
+                                    <option value="4">⭐⭐⭐⭐ Very Good (4 stars)</option>
+                                    <option value="3">⭐⭐⭐ Good (3 stars)</option>
+                                    <option value="2">⭐⭐ Fair (2 stars)</option>
+                                    <option value="1">⭐ Poor (1 star)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="feedback" class="form-label">Your Feedback <span class="text-danger">*</span></label>
+                                <textarea class="form-control" id="feedback" name="feedback" rows="4" required placeholder="Tell us about your experience with Bantay PurrPaws..."></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-lg cta-primary">Submit Feedback</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <a href="/login" class="alert-link">Login</a> or <a href="/user-register" class="alert-link">Register</a> to share your feedback.
+                    </div>
+                {% endif %}
+
+                <h3 class="text-primary mb-3">Community Reviews</h3>
+                {% if stories %}
+                    <div class="row g-4">
+                        {% for story in stories %}
+                            <div class="col-md-6">
+                                <div class="feature-box p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="mb-0">{{ story.user_name }}</h5>
+                                        <div>
+                                            {% for i in range(1, 6) %}
+                                                {% if i <= story.rating %}
+                                                    <span class="text-warning">⭐</span>
+                                                {% else %}
+                                                    <span class="text-muted">☆</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <p class="text-muted small mb-2">{{ story.created_at[:10] }}</p>
+                                    <p class="mb-0">{{ story.feedback }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">No community stories yet. Be the first to share!</div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row py-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="footer-contact">
+                        <a href="tel:(414) 857-0107" class="text-white text-decoration-none me-3">📞 (414) 857 - 0107</a>
+                        <a href="mailto:report@purrpaws.com" class="text-white text-decoration-none">📧 report@purrpaws.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-copyright">
+                        <p class="mb-0">&copy; 2025 Bantay PurrPaws. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

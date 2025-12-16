@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bantay PurrPaws: Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-override.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <a class="skip-link sr-only" href="#main-content">Skip to content</a>
+
+    <div class="site-content-wrapper">
+        <!-- Modern Header -->
+        <header class="main-header">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <a href="/" class="navbar-brand">
+                        <img src="/static/purrpaws-logo.png" alt="Bantay PurrPaws Logo" class="navbar-brand-img">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/report-animal">Report Animal</a></li>
+                            {% if user_role == 'admin' %}
+                                <li class="nav-item"><a class="nav-link fw-bold text-primary" href="/admin/dashboard">Admin</a></li>
+                            {% endif %}
+                        </ul>
+                        <div class="profile-dropdown-container">
+                            <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
+                                {% if user_role != 'guest' %}
+                                    {{ current_user.full_name or 'User' }} ▾
+                                {% else %}
+                                    Profile ▾
+                                {% endif %}
+                            </button>
+                            <div class="profile-dropdown-content">
+                                {% if user_role != 'guest' %}
+                                    <div class="px-3 py-2 border-bottom">
+                                        <div class="small"><strong>Email:</strong> {{ current_user.email if current_user else 'N/A' }}</div>
+                                        <div class="small"><strong>Status:</strong> <span class="badge bg-success">Verified</span></div>
+                                    </div>
+                                    <a href="/profile" class="dropdown-item">Edit Profile</a>
+                                    <a href="/user/dashboard" class="dropdown-item">Dashboard</a>
+                                    <a href="/notifications" class="dropdown-item">Notifications</a>
+                                    <a href="/logout" class="dropdown-item">Log Out</a>
+                                {% else %}
+                                    <a href="/login" class="dropdown-item">Login</a>
+                                    <a href="/user-register" class="dropdown-item">Register</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Modern Hero Section -->
+        <section class="hero-section-with-bg">
+            <div class="hero-content">
+                <div class="container">
+                    <div class="row justify-content-center text-center">
+                        <div class="col-lg-10">
+                            <h1 class="display-3 fw-bold mb-4">Helping Communities Track, Protect, and Recover Stray Animals</h1>
+                            <p class="lead mb-5">A centralized platform for managing stray animals, lost/found cases, and adoption opportunities in your community.</p>
+                            <div class="cta-group d-flex gap-3 justify-content-center flex-wrap">
+                                {% if user_role != 'guest' %}
+                                    <a href="/register" class="btn btn-lg cta-primary">Register Your Pet</a>
+                                    <a href="/report-animal" class="btn btn-lg cta-secondary">Report Lost Pet</a>
+                                    <a href="/report-animal" class="btn btn-lg cta-secondary">Report Found</a>
+                                {% else %}
+                                    <a href="/user-register" class="btn btn-lg cta-primary">Sign Up to Get Started</a>
+                                    <a href="/login" class="btn btn-lg cta-secondary">Login</a>
+                                    <a href="/view-all-pets" class="btn btn-lg cta-secondary">Browse Pets</a>
+                                {% endif %}
+                            </div>
+                            {% if user_role == 'guest' %}
+                                <div class="alert alert-info mt-4 mx-auto" style="max-width: 600px;">
+                                    <strong>Note:</strong> To register pets, report animals, or access advanced features, please <a href="/user-register" class="alert-link">create an account</a> or <a href="/login" class="alert-link">login</a>.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <main id="main-content" class="content" tabindex="-1">
+            <!-- System Introduction -->
+            <section class="py-5">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-10">
+                            <div class="feature-box p-4 p-md-5 mb-4 fade-in">
+                                <h2 class="text-center mb-4">What is Bantay PurrPaws?</h2>
+                                <p class="lead text-center mb-4">Bantay PurrPaws is a comprehensive system designed to help communities track, protect, and recover stray animals through responsible pet ownership and community participation.</p>
+                                <div class="row g-4 mt-2">
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <span style="font-size: 1.5rem;">🐾</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-primary mb-2">Pet Registration</h5>
+                                                <p class="mb-0">Register your pet with detailed information including photos, vaccination status, and contact details.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <span style="font-size: 1.5rem;">🔍</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-primary mb-2">Lost & Found System</h5>
+                                                <p class="mb-0">Our advanced matching system helps connect lost pets with found animals.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <span style="font-size: 1.5rem;">🏠</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-primary mb-2">Community Benefits</h5>
+                                                <p class="mb-0">Contribute to a safer community for all animals and support responsible pet ownership.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="d-flex align-items-start">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <span style="font-size: 1.5rem;">✅</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="text-primary mb-2">Admin Verification</h5>
+                                                <p class="mb-0">All submissions are verified by administrators to ensure accuracy and reliability.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Key Features -->
+            <section class="py-5 bg-white">
+                <div class="container">
+                    <h2 class="text-center mb-5">Key Features</h2>
+                    <div class="row g-4">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="feature-box p-4 h-100 text-center">
+                                <div class="mb-3" style="font-size: 3rem;">🐾</div>
+                                <h4 class="text-primary mb-3">Pet Registration</h4>
+                                <p class="mb-3">Register your pet with photos, vaccination status, and comprehensive information.</p>
+                                <a href="/register" class="btn cta-secondary">Learn More</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="feature-box p-4 h-100 text-center">
+                                <div class="mb-3" style="font-size: 3rem;">🔍</div>
+                                <h4 class="text-primary mb-3">Lost Pet Reporting</h4>
+                                <p class="mb-3">Report missing animals with essential information and photos.</p>
+                                <a href="/report-animal" class="btn cta-secondary">Report Lost Pet</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="feature-box p-4 h-100 text-center">
+                                <div class="mb-3" style="font-size: 3rem;">🏠</div>
+                                <h4 class="text-primary mb-3">Found Animal Reporting</h4>
+                                <p class="mb-3">Submit details about animals found to help reunite them with owners.</p>
+                                <a href="/report-animal" class="btn cta-secondary">Report Found</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="feature-box p-4 h-100 text-center">
+                                <div class="mb-3" style="font-size: 3rem;">🔎</div>
+                                <h4 class="text-primary mb-3">Searchable Database</h4>
+                                <p class="mb-3">Match lost pets with found reports using intelligent search.</p>
+                                <a href="/view-all-pets" class="btn cta-secondary">Search Database</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="feature-box p-4 h-100 text-center">
+                                <div class="mb-3" style="font-size: 3rem;">✅</div>
+                                <h4 class="text-primary mb-3">Admin Verification</h4>
+                                <p class="mb-3">Ensuring accuracy and reliability through comprehensive verification.</p>
+                                <a href="/view-all-pets" class="btn cta-secondary">View Verified</a>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4">
+                            <div class="feature-box p-4 h-100 text-center">
+                                <div class="mb-3" style="font-size: 3rem;">📱</div>
+                                <h4 class="text-primary mb-3">Real-time Updates</h4>
+                                <p class="mb-3">Receive notifications and updates about your pet registrations.</p>
+                                <a href="/user/dashboard" class="btn cta-secondary">View Dashboard</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lost & Found Preview -->
+            <section class="py-5">
+                <div class="container">
+                    <h2 class="text-center mb-5">Recent Lost & Found</h2>
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="feature-box p-4">
+                                <h4 class="text-primary mb-4">Recently Reported Lost</h4>
+                                {% if recent_lost %}
+                                    <div class="row g-3">
+                                        {% for r in recent_lost %}
+                                            <div class="col-12">
+                                                <div class="card border-0 shadow-sm">
+                                                    {% if r.photo_url %}
+                                                        <img src="{{ r.photo_url }}" alt="{{ r.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                                    {% endif %}
+                                                    <div class="card-body">
+                                                        <h5 class="card-title text-primary">{{ r.name }}</h5>
+                                                        <p class="card-text mb-1"><strong>Breed:</strong> {{ r.breed }}</p>
+                                                        <p class="card-text mb-1"><strong>Color:</strong> {{ r.color }}</p>
+                                                        <p class="card-text"><strong>Location:</strong> {{ r.location_data }}</p>
+                                                        {% if r.date_reported %}
+                                                            <small class="text-muted">Reported: {{ r.date_reported }}</small>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info">No recent lost reports.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="feature-box p-4">
+                                <h4 class="text-primary mb-4">Recently Found</h4>
+                                {% if recent_found %}
+                                    <div class="row g-3">
+                                        {% for r in recent_found %}
+                                            <div class="col-12">
+                                                <div class="card border-0 shadow-sm">
+                                                    {% if r.photo_url %}
+                                                        <img src="{{ r.photo_url }}" alt="{{ r.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
+                                                    {% endif %}
+                                                    <div class="card-body">
+                                                        <h5 class="card-title text-primary">{{ r.name }}</h5>
+                                                        <p class="card-text mb-1"><strong>Breed:</strong> {{ r.breed }}</p>
+                                                        <p class="card-text mb-1"><strong>Color:</strong> {{ r.color }}</p>
+                                                        <p class="card-text"><strong>Location:</strong> {{ r.location_data }}</p>
+                                                        {% if r.date_reported %}
+                                                            <small class="text-muted">Found: {{ r.date_reported }}</small>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-info">No recent found reports.</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- How It Works -->
+            <section class="py-5 bg-white">
+                <div class="container">
+                    <div class="feature-box p-4 p-md-5">
+                        <h2 class="text-center mb-5">How It Works</h2>
+                        <div class="row g-4">
+                            {% for step in [('1', 'Register or Login', 'Create an account or log in to access all features.'), ('2', 'Add Your Pet or Submit a Report', 'Register your pet or submit a lost/found animal report.'), ('3', 'Admin Verifies Information', 'Administrators review and verify all submissions.'), ('4', 'Search or Receive Matches', 'Use search tools or receive automatic match suggestions.'), ('5', 'Recover Your Pet', 'Connect with finders or owners to reunite pets.'), ('6', 'Stay Connected', 'Receive updates and notifications about your cases.')] %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="text-center">
+                                        <div class="dashboard-stat-card mb-3" style="padding: 1.5rem;">
+                                            <div class="stat-number">{{ step[0] }}</div>
+                                        </div>
+                                        <h5 class="text-primary mb-2">{{ step[1] }}</h5>
+                                        <p class="text-muted">{{ step[2] }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Statistics -->
+            <section class="py-5">
+                <div class="container">
+                    <div class="feature-box p-4 p-md-5">
+                        <h2 class="text-center mb-5">Community Impact</h2>
+                        <div class="row g-4 text-center">
+                            <div class="col-6 col-md-3">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-number">{{ stats.total_registered }}</div>
+                                    <div class="stat-label">Pets Registered</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-number">{{ stats.verified }}</div>
+                                    <div class="stat-label">Verified</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-number">{{ stats.reported_lost }}</div>
+                                    <div class="stat-label">Lost Reports</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="dashboard-stat-card">
+                                    <div class="stat-number">{{ stats.reported_found }}</div>
+                                    <div class="stat-label">Found Reports</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials -->
+            <section class="py-5 bg-white">
+                <div class="container">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="mb-0">Community Stories</h2>
+                        <a href="/community-stories" class="btn cta-primary">View All Stories</a>
+                    </div>
+                    <div class="feature-box p-4 text-center">
+                        {% if user_role != 'guest' %}
+                            <p class="mb-3 text-muted">No community stories to show yet.</p>
+                            <a href="/community-stories" class="btn cta-primary">Share Your Story</a>
+                        {% else %}
+                            <p class="mb-0 text-muted">Want to share your experience? <a href="/login" class="text-primary">Login</a> or <a href="/user-register" class="text-primary">Sign Up</a> to submit your feedback.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- About the Creators -->
+            <section class="py-5 bg-white">
+                <div class="container">
+                    <div class="feature-box p-4 p-md-5">
+                        <h2 class="text-center mb-5">About the Creators</h2>
+                        <p class="lead text-center mb-5">Bantay PurrPaws was created by a passionate team dedicated to helping communities protect and recover their beloved pets.</p>
+                        <div class="row g-4">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="mb-3" style="font-size: 4rem;">👩‍💻</div>
+                                    <h4 class="text-primary mb-2">Jessica Sales</h4>
+                                    <p class="text-muted">Lead Developer & System Architect</p>
+                                    <p class="small">Jessica's passion for animal welfare began when her own pet went missing. After experiencing the frustration of fragmented reporting systems, she envisioned a centralized platform that could bring communities together. With a background in software engineering, she led the technical development of Bantay PurrPaws, ensuring the system is both powerful and user-friendly.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="mb-3" style="font-size: 4rem;">👨‍💼</div>
+                                    <h4 class="text-primary mb-2">Algie Pawaan</h4>
+                                    <p class="text-muted">Community Outreach & Operations</p>
+                                    <p class="small">Algie brings years of experience in community organizing and animal rescue operations. Having worked with local shelters and rescue groups, he understood the critical need for better coordination between pet owners, finders, and rescue organizations. His vision shaped the matching and notification systems that make Bantay PurrPaws effective at reuniting pets with their families.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="mb-3" style="font-size: 4rem;">👨‍💻</div>
+                                    <h4 class="text-primary mb-2">Drew Teleron</h4>
+                                    <p class="text-muted">UI/UX Designer & Frontend Developer</p>
+                                    <p class="small">Drew's expertise in user experience design ensures that Bantay PurrPaws is accessible to everyone, regardless of technical skill level. After volunteering at animal shelters and witnessing the emotional toll of lost pets, he focused on creating an intuitive interface that reduces stress during already difficult times. His design philosophy centers on clarity, compassion, and ease of use.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-5 text-center">
+                            <h4 class="text-primary mb-3">Our Mission</h4>
+                            <p class="lead">Together, we created Bantay PurrPaws with a simple goal: to make pet recovery faster, more efficient, and less stressful for everyone involved. We believe that every pet deserves to be reunited with their family, and every community deserves tools that make this possible.</p>
+                            <p class="mt-3">This system represents our commitment to using technology for good, bringing together our diverse skills and shared passion for animal welfare to create something that truly makes a difference.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section class="py-5">
+                <div class="container">
+                    <div class="feature-box p-4 p-md-5 text-center">
+                        <h2 class="mb-4">Need Help?</h2>
+                        <p class="lead mb-4">If you need assistance or have questions, we're here to help!</p>
+                        <div class="d-flex gap-3 justify-content-center flex-wrap">
+                            <a href="/support" class="btn btn-lg cta-primary">Contact Support</a>
+                            <a href="/support" class="btn btn-lg cta-secondary">View FAQs</a>
+                            <a href="/community-stories" class="btn btn-lg cta-secondary">Community Stories</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modern Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row py-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="footer-contact">
+                        <a href="tel:(414) 857-0107" class="text-white text-decoration-none me-3">📞 (414) 857 - 0107</a>
+                        <a href="mailto:report@purrpaws.com" class="text-white text-decoration-none">📧 report@purrpaws.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-copyright">
+                        <p class="mb-0">&copy; 2025 Bantay PurrPaws. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row border-top border-light border-opacity-25 pt-3">
+                <div class="col-12 text-center">
+                    <a href="/" class="text-white text-decoration-none me-3">Home</a>
+                    <a href="/view-all-pets" class="text-white text-decoration-none me-3">Lost & Found</a>
+                    <a href="/support" class="text-white text-decoration-none me-3">Support</a>
+                    <a href="/support" class="text-white text-decoration-none">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('click', function(e){
+            const btn = e.target.closest('.profile-main-link');
+            if(btn){
+                const container = btn.closest('.profile-dropdown-container');
+                const isOpen = container.classList.toggle('open');
+                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                e.preventDefault();
+            } else {
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape'){
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Bantay PurrPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-override.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <a class="skip-link sr-only" href="#main-content">Skip to content</a>
+
+    <div class="site-content-wrapper">
+        <header class="main-header">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <a href="/" class="navbar-brand">
+                        <img src="/static/purrpaws-logo.png" alt="Bantay PurrPaws Logo" class="navbar-brand-img">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a class="nav-link active text-primary fw-bold" href="/admin/dashboard">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/pending">Pending Requests</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/users">User Management</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/exports">Reports & Exports</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/announcements">Announcements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/approved-history">Approved History</a></li>
+                        </ul>
+                        <div class="profile-dropdown-container">
+                            <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
+                                {{ current_user.full_name or 'User' }} ▾
+                            </button>
+                            <div class="profile-dropdown-content">
+                                <a href="/" class="dropdown-item">Home</a>
+                                <a href="/logout" class="dropdown-item">Log Out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main-content" class="content" tabindex="-1">
+            <div class="container my-4">
+                {% include 'partials/back_button.html' %}
+                <div class="text-center mb-5">
+                    <h1 class="text-primary mb-2">Admin Dashboard</h1>
+                    <p class="text-muted">Central control panel for managing all core operations</p>
+                </div>
+
+                <!-- System Statistics -->
+                <section class="mb-5">
+                    <h2 class="text-primary mb-4">System Statistics</h2>
+                    <div class="row g-3">
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="dashboard-stat-card text-center">
+                                <div class="stat-number">{{ stats.total_registered }}</div>
+                                <div class="stat-label">Total Registered</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="dashboard-stat-card text-center">
+                                <div class="stat-number">{{ stats.total_verified }}</div>
+                                <div class="stat-label">Verified</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="dashboard-stat-card text-center">
+                                <div class="stat-number">{{ stats.pending_regs }}</div>
+                                <div class="stat-label">Pending</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="dashboard-stat-card text-center">
+                                <div class="stat-number">{{ stats.reported_lost }}</div>
+                                <div class="stat-label">Lost Reports</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="dashboard-stat-card text-center">
+                                <div class="stat-number">{{ stats.reported_found }}</div>
+                                <div class="stat-label">Found Reports</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="dashboard-stat-card text-center">
+                                <div class="stat-number">{{ stats.resolved }}</div>
+                                <div class="stat-label">Resolved</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="dashboard-stat-card text-center">
+                                <div class="stat-number">{{ stats.active_users }}</div>
+                                <div class="stat-label">Active Users</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-4 col-lg-3">
+                            <div class="dashboard-stat-card text-center">
+                                <div class="stat-label">Quick Actions</div>
+                                <div class="mt-2 d-grid gap-2">
+                                    <a href="/admin/pending" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">Review Pending</a>
+                                    <a href="/admin/users" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">Manage Users</a>
+                                    <a href="/admin/announcements/create" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">Create Announcement</a>
+                                    <a href="/admin/approved-history" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">Approved History</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Actions -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="feature-box p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="text-primary mb-0">Pet Registration Management</h3>
+                                <a href="/admin/pending" class="btn btn-sm cta-primary">View All</a>
+                            </div>
+                            <p class="text-muted mb-3">Review and process new pet registrations.</p>
+                            <div class="alert alert-info mb-0">
+                                <strong>{{ stats.pending_regs }}</strong> requests awaiting review.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-box p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="text-primary mb-0">Lost & Found Reports</h3>
+                                <a href="/admin/pending" class="btn btn-sm cta-primary">View All</a>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <div class="h4 text-primary mb-1">{{ stats.reported_lost }}</div>
+                                        <div class="small text-muted">Lost Reports</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center p-3 bg-light rounded">
+                                        <div class="h4 text-primary mb-1">{{ stats.reported_found }}</div>
+                                        <div class="small text-muted">Found Reports</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search and Matching -->
+                <section class="feature-box p-4 mb-4">
+                    <h2 class="text-primary mb-3">Search and Matching Tools</h2>
+                    <form method="GET" action="/admin/dashboard" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="filter-breed" class="form-label">Breed</label>
+                            <input type="text" class="form-control" id="filter-breed" name="breed" placeholder="Breed" value="{{ filters.breed }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="filter-color" class="form-label">Color</label>
+                            <input type="text" class="form-control" id="filter-color" name="color" placeholder="Color" value="{{ filters.color }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="filter-location" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="filter-location" name="location" placeholder="Location" value="{{ filters.location }}">
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn cta-primary">Search</button>
+                        </div>
+                    </form>
+                </section>
+
+                <!-- Suggested Matches -->
+                {% if suggested_matches %}
+                    <section class="feature-box p-4 mb-4">
+                        <h2 class="text-primary mb-3">Suggested Matches</h2>
+                        {% for lost_id, matches in suggested_matches.items() %}
+                            <div class="card mb-3 border-0 shadow-sm">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Potential Matches</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        {% for m in matches %}
+                                            <div class="col-md-6 col-lg-4">
+                                                <div class="card border">
+                                                    {% if m.photo_url %}
+                                                        <img src="{{ m.photo_url }}" alt="{{ m.name }}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                                                    {% endif %}
+                                                    <div class="card-body">
+                                                        <h6 class="text-primary">{{ m.name }}</h6>
+                                                        <p class="mb-1 small"><strong>Breed:</strong> {{ m.breed }}</p>
+                                                        <p class="mb-1 small"><strong>Color:</strong> {{ m.color }}</p>
+                                                        <p class="mb-2 small"><strong>Location:</strong> {{ m.location_data }}</p>
+                                                        <a href="/admin/pending?breed={{ m.breed }}" class="btn btn-sm cta-primary">View in Pending</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </section>
+                {% endif %}
+
+                <!-- Reports & Analytics -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="feature-box p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="text-primary mb-0">Export Options</h3>
+                                <a href="/admin/exports" class="btn btn-sm cta-primary">View Exports</a>
+                            </div>
+                            <p class="text-muted mb-3">Generate CSV and PDF exports of all records.</p>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="/admin/export/pets.csv" class="btn btn-sm cta-secondary">Export CSV</a>
+                                <a href="/admin/export/pets.pdf" class="btn btn-sm cta-secondary">Export PDF</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feature-box p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="text-primary mb-0">User Management</h3>
+                                <a href="/admin/users" class="btn btn-sm cta-primary">Manage Users</a>
+                            </div>
+                            <p class="text-muted mb-3">Oversee user accounts and track activity.</p>
+                            <div class="alert alert-info mb-0">
+                                <strong>{{ stats.active_users }}</strong> active users in the system.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <section class="feature-box p-4 mb-4">
+                    <h2 class="text-primary mb-3">Recent Activity</h2>
+                    {% if logs %}
+                        <div class="list-group">
+                            {% for item in logs[:10] %}
+                                <div class="list-group-item">
+                                    <small class="text-muted">{{ item }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">No recent activity.</div>
+                    {% endif %}
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row py-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="footer-contact">
+                        <a href="tel:(414) 857-0107" class="text-white text-decoration-none me-3">📞 (414) 857 - 0107</a>
+                        <a href="mailto:report@purrpaws.com" class="text-white text-decoration-none">📧 report@purrpaws.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-copyright">
+                        <p class="mb-0">&copy; 2025 Bantay PurrPaws. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('click', function(e){
+            const btn = e.target.closest('.profile-main-link');
+            if(btn){
+                const container = btn.closest('.profile-dropdown-container');
+                const isOpen = container.classList.toggle('open');
+                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                e.preventDefault();
+            } else {
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape'){
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

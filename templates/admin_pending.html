@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Requests | Bantay PurrPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-override.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="site-content-wrapper">
+    <header class="main-header">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white" role="navigation" aria-label="Main navigation">
+            <div class="container-fluid">
+                <div class="navbar-logo">
+                    <a href="/" class="navbar-brand">
+                        <img src="/static/purrpaws-logo.png" alt="Bantay PurrPaws Logo" style="height: 60px;">
+                    </a>
+                </div>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a class="nav-link active fw-bold" href="/admin/dashboard" style="color: var(--maroon-600);">Admin Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/admin/pending">Pending Requests</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/admin/users">User Management</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/admin/exports">Reports & Exports</a></li>
+                    </ul>
+
+                    <div class="profile-dropdown-container">
+                        <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
+                            {{ current_user.full_name or 'User' }} ▾
+                        </button>
+                        <div class="profile-dropdown-content">
+                            <a href="/admin/dashboard" class="dropdown-item">Dashboard</a>
+                            <a href="/logout" class="dropdown-item">Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+<div class="content container my-4">
+    {% include 'partials/back_button.html' %}
+    <h1 class="text-center mb-3" style="color: var(--maroon-600);">Pending Requests</h1>
+    <p class="text-center text-muted mb-4">Review and approve/deny pending pet registrations and reports before they go public.</p>
+
+    {% if status == 'approved' %}
+        <div class="alert alert-success">Pet record successfully approved and moved to the public list.</div>
+    {% elif status == 'denied' or status == 'denied_pet' or status == 'denied_report' %}
+        <div class="alert alert-danger">Pet record successfully denied and removed from the queue.</div>
+    {% elif status == 'not_found' %}
+        <div class="alert alert-warning">Error: Pet record not found.</div>
+    {% elif status == 'info_needed' %}
+        <div class="alert alert-info">Information request sent to the user.</div>
+    {% elif status == 'found' %}
+        <div class="alert alert-success">Report marked as found.</div>
+    {% elif status == 'resolved' %}
+        <div class="alert alert-success">Case resolved successfully.</div>
+    {% endif %}
+
+
+    <h2 class="mb-4" style="color: var(--maroon-600);">Pending Pet Registrations ({{ pending_regs | length }})</h2>
+    
+    {% if pending_regs %}
+        <div class="card-grid">
+            {% for pet in pending_regs %}
+            <div class="pet-card" id="card-{{ pet.pet_id }}">
+                <div class="pet-card-header">
+                    <span>By {{ 'Reporter' if pet.is_stray else 'Owner' }}</span>
+                    <span>{{ pet.pet_id.hex[:8] }}...</span>
+                </div>
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <div class="pet-card-body" id="body-{{ pet.pet_id }}">
+                    <div class="pill {% if pet.is_stray %}stray{% else %}owned{% endif %}">{% if pet.is_stray %}Stray Report{% else %}Owned Pet{% endif %}</div>
+                    <h3>{{ pet.name }}</h3>
+                    <div class="pet-meta">{{ pet.breed }} • {{ pet.color }}</div>
+                    <div class="pet-meta">Location: {{ pet.location_data }}</div>
+                    <div class="pet-meta">
+                        {% if pet.is_stray %}
+                            Reporter: {{ pet.reporter_contact or 'N/A' }}
+                        {% else %}
+                            Owner: {{ pet.owner_name or 'N/A' }}
+                        {% endif %}
+                    </div>
+                    <div class="pet-meta">
+                        Contact: {% if pet.is_stray %}{{ pet.reporter_contact or 'N/A' }}{% else %}{{ pet.owner_contact or 'N/A' }}{% endif %}
+                    </div>
+                    <div class="pet-meta">
+                        {% if pet.vaccination_status %}
+                            <span class="pill vax-yes">Vaccinated</span>
+                        {% else %}
+                            <span class="pill vax-no">Not Vaccinated</span>
+                        {% endif %}
+                    </div>
+                    <div class="pet-meta">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ pet.location_data | urlencode }}" target="_blank">Open location</a>
+                    </div>
+                </div>
+                <div class="pet-card-footer" id="footer-{{ pet.pet_id }}">
+                    <div class="card-actions">
+                        <form method="POST" action="/admin/approve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            
+                            <button type="submit" class="btn btn-sm cta-primary">
+                                Approve
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/request-info">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            
+                            <textarea name="note" placeholder="Request details" style="width:100%; margin-bottom:6px; font-size:0.9em;"></textarea>
+                            <button type="submit" class="btn btn-sm cta-secondary">
+                                Request Info
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/resolve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                Resolve
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/deny">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Deny
+                            </button>
+                        </form>
+                            <button type="button" class="btn btn-sm cta-secondary" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="{{ pet.owner_name or '' }}" data-contact="{{ pet.owner_contact or pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="feature-box" style="text-align: center;">
+            <h2>🎉 No pending registrations</h2>
+            <p>There are no pending pet registration requests at this time.</p>
+        </div>
+    {% endif %}
+
+    <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Info Needed Registrations ({{ info_regs | length }})</h2>
+    {% if info_regs %}
+        <div class="card-grid">
+            {% for pet in info_regs %}
+            <div class="pet-card" id="card-{{ pet.pet_id }}">
+                <div class="pet-card-header">
+                    <span>By Owner</span>
+                    <span>{{ pet.pet_id.hex[:8] }}...</span>
+                </div>
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <div class="pet-card-body" id="body-{{ pet.pet_id }}">
+                    <div class="pill owned">Owned Pet</div>
+                    <h3>{{ pet.name }}</h3>
+                    <div class="pet-meta">{{ pet.breed }} • {{ pet.color }}</div>
+                    <div class="pet-meta">Location: {{ pet.location_data }}</div>
+                    <div class="pet-meta">Owner: {{ pet.owner_name or 'N/A' }}</div>
+                    <div class="pet-meta">Contact: {{ pet.owner_contact or 'N/A' }}</div>
+                    <div class="pet-meta"><span class="pill vax-no">Info Needed</span></div>
+                    <div class="pet-meta"><a href="https://www.google.com/maps/search/?api=1&query={{ pet.location_data | urlencode }}" target="_blank">Open location</a></div>
+                </div>
+                <div class="pet-card-footer" id="footer-{{ pet.pet_id }}">
+                    <div class="card-actions">
+                        <form method="POST" action="/admin/approve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <button type="submit" class="btn btn-sm cta-primary">
+                                Approve
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/resolve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <button type="submit" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em; background:#f1f1f1; color:#333; border:1px solid #ccc;">
+                                Resolve
+                            </button>
+                        </form>
+                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="{{ pet.owner_name or '' }}" data-contact="{{ pet.owner_contact or '' }}" data-id="{{ pet.pet_id }}">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="feature-box" style="text-align: center;">
+            <h2>No info-needed registrations</h2>
+        </div>
+    {% endif %}
+
+    <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Approved Registrations ({{ approved_regs | length }})</h2>
+    {% if approved_regs %}
+        <div class="card-grid">
+            {% for pet in approved_regs %}
+            <div class="pet-card" id="card-{{ pet.pet_id }}">
+                <div class="pet-card-header">
+                    <span>By Owner</span>
+                    <span>{{ pet.pet_id.hex[:8] }}...</span>
+                </div>
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <div class="pet-card-body" id="body-{{ pet.pet_id }}">
+                    <div class="pill owned">Owned Pet</div>
+                    <h3>{{ pet.name }}</h3>
+                    <div class="pet-meta">{{ pet.breed }} • {{ pet.color }}</div>
+                    <div class="pet-meta">Location: {{ pet.location_data }}</div>
+                    <div class="pet-meta">Owner: {{ pet.owner_name or 'N/A' }}</div>
+                    <div class="pet-meta">Contact: {{ pet.owner_contact or 'N/A' }}</div>
+                    <div class="pet-meta"><span class="pill vax-yes">Approved</span></div>
+                    <div class="pet-meta"><a href="https://www.google.com/maps/search/?api=1&query={{ pet.location_data | urlencode }}" target="_blank">Open location</a></div>
+                </div>
+                <div class="pet-card-footer" id="footer-{{ pet.pet_id }}">
+                    <div class="card-actions">
+                        <form method="POST" action="/admin/resolve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <!-- session-based -->
+                            <button type="submit" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em; background:#f1f1f1; color:#333; border:1px solid #ccc;">
+                                Resolve
+                            </button>
+                        </form>
+                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="{{ pet.owner_name or '' }}" data-contact="{{ pet.owner_contact or '' }}" data-id="{{ pet.pet_id }}">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="feature-box" style="text-align: center;">
+            <h2>No approved registrations</h2>
+        </div>
+    {% endif %}
+
+    <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Pending Lost Reports ({{ pending_lost_reports | length }})</h2>
+    {% if pending_lost_reports %}
+        <div class="card-grid">
+            {% for pet in pending_lost_reports %}
+            <div class="pet-card" id="card-{{ pet.pet_id }}">
+                <div class="pet-card-header">
+                    <span>By Reporter</span>
+                    <span>{{ pet.pet_id.hex[:8] }}...</span>
+                </div>
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <div class="pet-card-body" id="body-{{ pet.pet_id }}">
+                    <div class="pill stray">Lost</div>
+                    <h3>{{ pet.name }}</h3>
+                    <div class="pet-meta">{{ pet.breed }} • {{ pet.color }}</div>
+                    <div class="pet-meta">Location: {{ pet.location_data }}</div>
+                    <div class="pet-meta">Reporter: {{ pet.reporter_contact or 'N/A' }}</div>
+                    <div class="pet-meta">
+                        {% if pet.status == 'info_needed' %}
+                            <span class="pill vax-no">Info Needed</span>
+                        {% elif pet.status == 'pending' %}
+                            <span class="pill vax-yes" style="background:#e8ecff; color:#223;">Pending</span>
+                        {% elif pet.status == 'approved' %}
+                            <span class="pill vax-yes" style="background:#e6ffe6; color:#225;">Approved</span>
+                        {% endif %}
+                    </div>
+                    <div class="pet-meta">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ pet.location_data | urlencode }}" target="_blank">Open location</a>
+                    </div>
+                </div>
+                <div class="pet-card-footer" id="footer-{{ pet.pet_id }}">
+                    <div class="card-actions">
+                        <form method="POST" action="/admin/approve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <!-- session-based -->
+                            <button type="submit" class="btn btn-sm cta-primary">
+                                Approve
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/request-info">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <!-- session-based -->
+                            <textarea name="note" placeholder="Request details" style="width:100%; margin-bottom:6px; font-size:0.9em;"></textarea>
+                            <button type="submit" class="btn btn-sm cta-secondary">
+                                Request Info
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/mark-found">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <button type="submit" class="btn btn-sm btn-outline-info">
+                                Mark Found
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/resolve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <!-- session-based -->
+                            <button type="submit" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em; background:#f1f1f1; color:#333; border:1px solid #ccc;">
+                                Resolve
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/deny">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <!-- session-based -->
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Deny
+                            </button>
+                        </form>
+                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="" data-contact="{{ pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="feature-box" style="text-align: center;">
+            <h2>🎉 No pending lost reports</h2>
+            <p>There are no pending animal reports at this time.</p>
+        </div>
+    {% endif %}
+
+    <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Pending Found Reports ({{ pending_found_reports | length }})</h2>
+    {% if pending_found_reports %}
+        <div class="card-grid">
+            {% for pet in pending_found_reports %}
+            <div class="pet-card" id="card-{{ pet.pet_id }}">
+                <div class="pet-card-header">
+                    <span>By Reporter</span>
+                    <span>{{ pet.pet_id.hex[:8] }}...</span>
+                </div>
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <div class="pet-card-body" id="body-{{ pet.pet_id }}">
+                    <div class="pill stray">Found</div>
+                    <h3>{{ pet.name }}</h3>
+                    <div class="pet-meta">{{ pet.breed }} • {{ pet.color }}</div>
+                    <div class="pet-meta">Location: {{ pet.location_data }}</div>
+                    <div class="pet-meta">Reporter: {{ pet.reporter_contact or 'N/A' }}</div>
+                    <div class="pet-meta">
+                        {% if pet.status == 'info_needed' %}
+                            <span class="pill vax-no">Info Needed</span>
+                        {% elif pet.status == 'pending' %}
+                            <span class="pill vax-yes" style="background:#e8ecff; color:#223;">Pending</span>
+                        {% elif pet.status == 'approved' %}
+                            <span class="pill vax-yes" style="background:#e6ffe6; color:#225;">Approved</span>
+                        {% endif %}
+                    </div>
+                    <div class="pet-meta">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ pet.location_data | urlencode }}" target="_blank">Open location</a>
+                    </div>
+                </div>
+                <div class="pet-card-footer" id="footer-{{ pet.pet_id }}">
+                    <div class="card-actions">
+                        <form method="POST" action="/admin/approve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <!-- session-based -->
+                            <button type="submit" class="btn btn-sm cta-primary">
+                                Approve
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/request-info">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <!-- session-based -->
+                            <textarea name="note" placeholder="Request details" style="width:100%; margin-bottom:6px; font-size:0.9em;"></textarea>
+                            <button type="submit" class="btn btn-sm cta-secondary">
+                                Request Info
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/resolve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <!-- session-based -->
+                            <button type="submit" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em; background:#f1f1f1; color:#333; border:1px solid #ccc;">
+                                Resolve
+                            </button>
+                        </form>
+                        <form method="POST" action="/admin/deny">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <!-- session-based -->
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Deny
+                            </button>
+                        </form>
+                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="" data-contact="{{ pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="feature-box" style="text-align: center;">
+            <h2>🎉 No pending found reports</h2>
+        </div>
+    {% endif %}
+
+    <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Approved Reports ({{ approved_reports | length }})</h2>
+    {% if approved_reports %}
+        <div class="card-grid">
+            {% for pet in approved_reports %}
+            <div class="pet-card" id="card-{{ pet.pet_id }}">
+                <div class="pet-card-header">
+                    <span>By Reporter</span>
+                    <span>{{ pet.pet_id.hex[:8] }}...</span>
+                </div>
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <div class="pet-card-body" id="body-{{ pet.pet_id }}">
+                    <div class="pill stray">{% if pet.is_found %}Found{% else %}Lost{% endif %}</div>
+                    <h3>{{ pet.name }}</h3>
+                    <div class="pet-meta">{{ pet.breed }} • {{ pet.color }}</div>
+                    <div class="pet-meta">Location: {{ pet.location_data }}</div>
+                    <div class="pet-meta">Reporter: {{ pet.reporter_contact or 'N/A' }}</div>
+                    <div class="pet-meta"><span class="pill vax-yes" style="background:#e6ffe6; color:#225;">Approved</span></div>
+                    <div class="pet-meta">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ pet.location_data | urlencode }}" target="_blank">Open location</a>
+                    </div>
+                </div>
+                <div class="pet-card-footer" id="footer-{{ pet.pet_id }}">
+                    <div class="card-actions">
+                        <form method="POST" action="/admin/resolve">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id }}">
+                            <input type="hidden" name="user_role" value="{{ user_role }}">
+                            <button type="submit" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em; background:#f1f1f1; color:#333; border:1px solid #ccc;">
+                                Resolve
+                            </button>
+                        </form>
+                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="" data-contact="{{ pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="feature-box" style="text-align: center;">
+            <h2>No approved reports</h2>
+        </div>
+    {% endif %}
+
+    <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Resolved Reports ({{ resolved_reports | length }})</h2>
+    {% if resolved_reports %}
+        <div class="card-grid">
+            {% for pet in resolved_reports %}
+            <div class="pet-card" id="card-{{ pet.pet_id }}">
+                <div class="pet-card-header">
+                    <span>By Reporter</span>
+                    <span>{{ pet.pet_id.hex[:8] }}...</span>
+                </div>
+                <img src="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" alt="{{ pet.name }}">
+                <div class="pet-card-body" id="body-{{ pet.pet_id }}">
+                    <div class="pill stray">{% if pet.is_found %}Found{% else %}Lost{% endif %}</div>
+                    <h3>{{ pet.name }}</h3>
+                    <div class="pet-meta">{{ pet.breed }} • {{ pet.color }}</div>
+                    <div class="pet-meta">Location: {{ pet.location_data }}</div>
+                    <div class="pet-meta">Reporter: {{ pet.reporter_contact or 'N/A' }}</div>
+                    <div class="pet-meta"><span class="pill vax-no">Resolved</span></div>
+                    <div class="pet-meta">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ pet.location_data | urlencode }}" target="_blank">Open location</a>
+                    </div>
+                </div>
+                <div class="pet-card-footer" id="footer-{{ pet.pet_id }}">
+                    <div class="card-actions">
+                        <button type="button" class="cta-button cta-secondary" style="padding: 8px 12px; border-radius: 4px; font-size: 0.9em;" onclick="openDetails(this)" data-name="{{ pet.name }}" data-breed="{{ pet.breed }}" data-color="{{ pet.color }}" data-location="{{ pet.location_data }}" data-photo="{{ pet.photo_url if pet.photo_url else '/static/purrpaws-logo.png' }}" data-owner="" data-contact="{{ pet.reporter_contact or '' }}" data-id="{{ pet.pet_id }}">
+                            Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="feature-box" style="text-align: center;">
+            <h2>No resolved reports</h2>
+        </div>
+    {% endif %}
+
+    <div id="petModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <button class="modal-close" onclick="closePetModal()">×</button>
+            <img class="modal-photo" src="/static/purrpaws-logo.png" alt="Pet photo">
+            <div class="modal-body">
+                <h2 class="modal-title"></h2>
+                <p class="modal-tag"></p>
+                <ul class="modal-details">
+                    <li><strong>Breed:</strong> <span data-field="breed"></span></li>
+                    <li><strong>Color:</strong> <span data-field="color"></span></li>
+                    <li><strong>Location:</strong> <span data-field="location"></span></li>
+                    <li><strong>Vaccinated:</strong> <span data-field="vax"></span></li>
+                    <li><strong>Contact:</strong> <span data-field="contact"></span></li>
+                    <li><strong>Owner:</strong> <span data-field="owner"></span></li>
+                    <li><strong>Reporter:</strong> <span data-field="reporter"></span></li>
+                    <li><strong>ID:</strong> <span data-field="id"></span></li>
+                    <li><strong>Map:</strong> <a href="#" data-field="maplink" target="_blank">Open map</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+
+    <footer class="footer mt-auto">
+        <div class="footer-content container">
+            <div class="row py-4">
+                <div class="col-md-6">
+                    <div class="footer-contact">
+                        <a href="tel:(414) 857-0107" class="text-white text-decoration-none me-3">📞 (414) 857 - 0107</a>
+                        <a href="mailto:report@purrpaws.com" class="text-white text-decoration-none">📧 report@purrpaws.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-copyright">
+                        <p class="mb-0">&copy; 2025 Bantay PurrPaws. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+<script>
+    function closePetModal() {
+        const modal = document.getElementById('petModal');
+        modal.classList.remove('show');
+    }
+    function openDetails(btn) {
+        const modal = document.getElementById('petModal');
+        const d = btn.dataset;
+        modal.querySelector('.modal-photo').src = d.photo || '/static/purrpaws-logo.png';
+        modal.querySelector('.modal-title').textContent = d.name || 'Pet';
+        modal.querySelector('.modal-tag').textContent = d.id || '';
+        modal.querySelector('[data-field="breed"]').textContent = d.breed || '—';
+        modal.querySelector('[data-field="color"]').textContent = d.color || '—';
+        modal.querySelector('[data-field="location"]').textContent = d.location || '—';
+        modal.querySelector('[data-field="vax"]').textContent = d.vax || '—';
+        modal.querySelector('[data-field="contact"]').textContent = d.contact || '—';
+        modal.querySelector('[data-field="owner"]').textContent = d.owner || '—';
+        modal.querySelector('[data-field="reporter"]').textContent = d.contact || '—';
+        modal.querySelector('[data-field="id"]').textContent = d.id || '—';
+        const mapLink = modal.querySelector('[data-field="maplink"]');
+        if (d.location) {
+            mapLink.href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.location)}`;
+        } else {
+            mapLink.href = '#';
+        }
+        modal.classList.add('show');
+    }
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closePetModal();
+    });
+
+    // Accessible profile dropdown toggle
+    document.addEventListener('click', function(e){
+        const btn = e.target.closest('.profile-main-link');
+        if(btn){
+            const container = btn.closest('.profile-dropdown-container');
+            const isOpen = container.classList.toggle('open');
+            btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            e.preventDefault();
+        } else {
+            document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                c.classList.remove('open');
+                const b = c.querySelector('.profile-main-link');
+                if(b) b.setAttribute('aria-expanded','false');
+            });
+        }
+    });
+    document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape'){
+            document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                c.classList.remove('open');
+                const b = c.querySelector('.profile-main-link');
+                if(b) b.setAttribute('aria-expanded','false');
+            });
+        }
+    });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Exports | Bantay PurrPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-override.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <a class="skip-link sr-only" href="#main-content">Skip to content</a>
+
+    <div class="site-content-wrapper">
+        <header class="main-header">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <a href="/" class="navbar-brand">
+                        <img src="/static/purrpaws-logo.png" alt="Bantay PurrPaws Logo" class="navbar-brand-img">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a class="nav-link text-primary fw-bold" href="/admin/dashboard">Admin Dashboard</a></li>
+                        </ul>
+                        <div class="profile-dropdown-container">
+                            <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
+                                {{ current_user.full_name or 'User' }} ▾
+                            </button>
+                            <div class="profile-dropdown-content">
+                                <a href="/logout" class="dropdown-item">Log Out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main-content" class="content" tabindex="-1">
+            <div class="container my-4">
+                {% include 'partials/back_button.html' %}
+                <div class="text-center mb-4">
+                    <h1 class="text-primary mb-2">Admin Exports</h1>
+                    <p class="text-muted">Generate and manage data exports</p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="feature-box p-4">
+                            <h3 class="text-primary mb-3">Generate Export</h3>
+                            <a href="/admin/exports/generate" class="btn btn-lg cta-primary w-100 mb-4" role="button">
+                                Generate Export Now
+                            </a>
+
+                            <h4 class="text-primary mb-3">Schedule New Export</h4>
+                            <form method="post" action="/admin/exports/schedule">
+                                <div class="mb-3">
+                                    <label for="frequency_minutes" class="form-label">Frequency (minutes)</label>
+                                    <input class="form-control" type="number" name="frequency_minutes" id="frequency_minutes" value="1440" min="1" />
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input class="form-check-input" type="checkbox" name="start_immediately" id="start_immediately" />
+                                    <label class="form-check-label" for="start_immediately">Run immediately</label>
+                                </div>
+                                <button class="btn cta-primary w-100" type="submit">Schedule</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <div class="feature-box p-4">
+                            <h3 class="text-primary mb-3">Generated Exports</h3>
+                            {% if exports %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-primary">
+                                            <tr>
+                                                <th>Timestamp</th>
+                                                <th>CSV</th>
+                                                <th>PDF</th>
+                                                <th>Created By</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for e in exports %}
+                                                <tr>
+                                                    <td>{{ e.timestamp }}</td>
+                                                    <td>
+                                                        {% if e.csv %}
+                                                            <a href="/admin/exports/download/{{ e.export_id }}/csv" class="btn btn-sm btn-outline-primary">Download CSV</a>
+                                                        {% else %}
+                                                            <span class="text-muted">N/A</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if e.pdf %}
+                                                            <a href="/admin/exports/download/{{ e.export_id }}/pdf" class="btn btn-sm btn-outline-primary">Download PDF</a>
+                                                        {% else %}
+                                                            <span class="text-muted">N/A</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>{{ e.created_by or 'system' }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No exports yet.</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="feature-box p-4 mt-4">
+                            <h4 class="text-primary mb-3">Scheduled Jobs</h4>
+                            {% if scheduled %}
+                                <div class="list-group">
+                                    {% for s in scheduled %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>Job {{ s.job_id }}</strong><br>
+                                                <small class="text-muted">Every {{ s.frequency_minutes }} minutes — created by {{ s.created_by or 'system' }}</small>
+                                            </div>
+                                            <form method="post" action="/admin/exports/unschedule" class="d-inline">
+                                                <input type="hidden" name="job_id" value="{{ s.job_id }}" />
+                                                <button class="btn btn-sm btn-danger" type="submit">Unschedule</button>
+                                            </form>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-muted">No scheduled jobs.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row py-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="footer-contact">
+                        <a href="tel:(414) 857-0107" class="text-white text-decoration-none me-3">📞 (414) 857 - 0107</a>
+                        <a href="mailto:report@purrpaws.com" class="text-white text-decoration-none">📧 report@purrpaws.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-copyright">
+                        <p class="mb-0">&copy; 2025 Bantay PurrPaws. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('click', function(e){
+            const btn = e.target.closest('.profile-main-link');
+            if(btn){
+                const container = btn.closest('.profile-dropdown-container');
+                const isOpen = container.classList.toggle('open');
+                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                e.preventDefault();
+            } else {
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape'){
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

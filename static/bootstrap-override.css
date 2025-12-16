@@ -1,0 +1,124 @@
+/* Modern Bootstrap Override - Maroon Theme */
+:root {
+    --maroon-900: #4a0000;
+    --maroon-800: #660000;
+    --maroon-700: #800000;
+    --maroon-600: #990000;
+    --maroon-500: #b22222;
+    --maroon-400: #c64b4b;
+    --maroon-300: #d88b8b;
+    --maroon-200: #e8b8b8;
+    --maroon-100: #f5e0e0;
+    
+    --bs-primary: var(--maroon-600);
+    --bs-primary-rgb: 153, 0, 0;
+    --bs-primary-dark: var(--maroon-700);
+}
+
+body {
+    background-color: #fafafa;
+}
+
+/* Override Bootstrap primary color */
+.btn-primary,
+.cta-primary {
+    background-color: var(--maroon-600) !important;
+    border-color: var(--maroon-600) !important;
+    color: white !important;
+}
+
+.btn-primary:hover,
+.cta-primary:hover {
+    background-color: var(--maroon-700) !important;
+    border-color: var(--maroon-700) !important;
+    color: white !important;
+}
+
+.btn-outline-primary {
+    color: var(--maroon-600) !important;
+    border-color: var(--maroon-600) !important;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--maroon-600) !important;
+    border-color: var(--maroon-600) !important;
+    color: white !important;
+}
+
+/* Secondary buttons */
+.cta-secondary,
+.btn-outline-secondary {
+    background: transparent !important;
+    color: var(--maroon-600) !important;
+    border: 2px solid var(--maroon-600) !important;
+}
+
+.cta-secondary:hover,
+.btn-outline-secondary:hover {
+    background: var(--maroon-600) !important;
+    color: white !important;
+    border-color: var(--maroon-600) !important;
+}
+
+/* Text primary color */
+.text-primary {
+    color: var(--maroon-600) !important;
+}
+
+/* Navbar improvements */
+.navbar {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.navbar-brand-img {
+    height: 50px;
+    transition: transform 0.3s ease;
+}
+
+.navbar-brand:hover .navbar-brand-img {
+    transform: scale(1.05);
+}
+
+/* Form controls */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--maroon-600);
+    box-shadow: 0 0 0 0.2rem rgba(153, 0, 0, 0.15);
+}
+
+/* Cards */
+.card {
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Badges */
+.badge {
+    border-radius: 6px;
+    padding: 0.375rem 0.75rem;
+    font-weight: 600;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 8px;
+    border: none;
+}
+
+/* Mobile optimizations */
+@media (max-width: 576px) {
+    .navbar-brand-img {
+        height: 40px;
+    }
+    
+    .btn-lg {
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+}
