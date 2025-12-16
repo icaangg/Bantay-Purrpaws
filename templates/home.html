@@ -26,6 +26,8 @@
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
                             <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/lost">Lost</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/found">Found</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
                             <li class="nav-item"><a class="nav-link" href="/report-animal">Report Animal</a></li>
                             {% if user_role == 'admin' %}
@@ -72,12 +74,12 @@
                             <div class="cta-group d-flex gap-3 justify-content-center flex-wrap">
                                 {% if user_role != 'guest' %}
                                     <a href="/register" class="btn btn-lg cta-primary">Register Your Pet</a>
-                                    <a href="/report-animal" class="btn btn-lg cta-secondary">Report Lost Pet</a>
-                                    <a href="/report-animal" class="btn btn-lg cta-secondary">Report Found</a>
+                                    <a href="/report-animal" class="btn btn-lg cta-primary">Report Lost Pet</a>
+                                    <a href="/report-animal" class="btn btn-lg cta-primary">Report Found</a>
                                 {% else %}
                                     <a href="/user-register" class="btn btn-lg cta-primary">Sign Up to Get Started</a>
-                                    <a href="/login" class="btn btn-lg cta-secondary">Login</a>
-                                    <a href="/view-all-pets" class="btn btn-lg cta-secondary">Browse Pets</a>
+                                    <a href="/login" class="btn btn-lg cta-primary">Login</a>
+                                    <a href="/view-all-pets" class="btn btn-lg cta-primary">Browse Pets</a>
                                 {% endif %}
                             </div>
                             {% if user_role == 'guest' %}
@@ -212,73 +214,6 @@
                                 <h4 class="text-primary mb-3">Real-time Updates</h4>
                                 <p class="mb-3">Receive notifications and updates about your pet registrations.</p>
                                 <a href="/user/dashboard" class="btn cta-secondary">View Dashboard</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Lost & Found Preview -->
-            <section class="py-5">
-                <div class="container">
-                    <h2 class="text-center mb-5">Recent Lost & Found</h2>
-                    <div class="row g-4">
-                        <div class="col-lg-6">
-                            <div class="feature-box p-4">
-                                <h4 class="text-primary mb-4">Recently Reported Lost</h4>
-                                {% if recent_lost %}
-                                    <div class="row g-3">
-                                        {% for r in recent_lost %}
-                                            <div class="col-12">
-                                                <div class="card border-0 shadow-sm">
-                                                    {% if r.photo_url %}
-                                                        <img src="{{ r.photo_url }}" alt="{{ r.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                                                    {% endif %}
-                                                    <div class="card-body">
-                                                        <h5 class="card-title text-primary">{{ r.name }}</h5>
-                                                        <p class="card-text mb-1"><strong>Breed:</strong> {{ r.breed }}</p>
-                                                        <p class="card-text mb-1"><strong>Color:</strong> {{ r.color }}</p>
-                                                        <p class="card-text"><strong>Location:</strong> {{ r.location_data }}</p>
-                                                        {% if r.date_reported %}
-                                                            <small class="text-muted">Reported: {{ r.date_reported }}</small>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                {% else %}
-                                    <div class="alert alert-info">No recent lost reports.</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="feature-box p-4">
-                                <h4 class="text-primary mb-4">Recently Found</h4>
-                                {% if recent_found %}
-                                    <div class="row g-3">
-                                        {% for r in recent_found %}
-                                            <div class="col-12">
-                                                <div class="card border-0 shadow-sm">
-                                                    {% if r.photo_url %}
-                                                        <img src="{{ r.photo_url }}" alt="{{ r.name }}" class="card-img-top" style="height: 200px; object-fit: cover;">
-                                                    {% endif %}
-                                                    <div class="card-body">
-                                                        <h5 class="card-title text-primary">{{ r.name }}</h5>
-                                                        <p class="card-text mb-1"><strong>Breed:</strong> {{ r.breed }}</p>
-                                                        <p class="card-text mb-1"><strong>Color:</strong> {{ r.color }}</p>
-                                                        <p class="card-text"><strong>Location:</strong> {{ r.location_data }}</p>
-                                                        {% if r.date_reported %}
-                                                            <small class="text-muted">Found: {{ r.date_reported }}</small>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                {% else %}
-                                    <div class="alert alert-info">No recent found reports.</div>
-                                {% endif %}
                             </div>
                         </div>
                     </div>

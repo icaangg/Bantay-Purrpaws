@@ -25,6 +25,8 @@
                     <ul class="navbar-nav mx-auto">
                         <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                         <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/lost">Lost</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/found">Found</a></li>
                         <li class="nav-item"><a class="nav-link active" href="/register">Register Pet</a></li>
                         <li class="nav-item"><a class="nav-link" href="/report-animal">Report Animal</a></li>
                         {% if user_role == 'admin' %}
@@ -78,8 +80,8 @@
                                     <input type="text" class="form-control" id="name" name="name" required placeholder="e.g., Buddy, Fido, Mittens">
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="species" class="form-label">Species</label>
-                                    <select class="form-select" id="species" name="species">
+                                    <label for="species" class="form-label">Species <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="species" name="species" required>
                                         <option value="" disabled selected>Select Species</option>
                                         <option value="Dog">Dog</option>
                                         <option value="Cat">Cat</option>

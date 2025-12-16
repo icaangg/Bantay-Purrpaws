@@ -434,7 +434,8 @@ def load_state():
     approved_registration_history.clear()
     approved_registration_history.extend([_pet_from_dict(p) for p in data.get("approved_registration_history", [])])
     logs = data.get("logs", [])
-    notifications = [_notification_from_dict(n) for n in data.get("notifications", [])]
+    notifications.clear()
+    notifications.extend([_notification_from_dict(n) for n in data.get("notifications", [])])
     announcements_list = [_announcement_from_dict(a) for a in data.get("announcements", [])]
     community_stories = [_story_from_dict(s) for s in data.get("community_stories", [])]
     # Load persisted exports and scheduled jobs if present
@@ -603,11 +604,29 @@ def read_notifications(request: Request):
     if not current_user:
         return RedirectResponse(url="/login?error=Login required.", status_code=HTTP_303_SEE_OTHER)
 
-    # Show only unread notifications by default
-    user_notifications = [n for n in notifications if n.user_id and str(n.user_id) == str(current_user.user_id) and not n.read]
+    # Show all notifications for the user (both read and unread)
+    global notifications
+    user_notifications = [n for n in notifications if n.user_id and str(n.user_id) == str(current_user.user_id)]
+    
+    # Sort notifications: unread first, then by timestamp (newest first)
+    def sort_key(n: Notification):
+        # Unread notifications come first (False sorts before True)
+        read_priority = 0 if not n.read else 1
+        # Parse timestamp for sorting (newest first)
+        try:
+            if n.timestamp:
+                ts = datetime.fromisoformat(n.timestamp.replace('Z', '+00:00'))
+                timestamp_value = ts.timestamp()
+            else:
+                timestamp_value = 0
+        except:
+            timestamp_value = 0
+        return (read_priority, -timestamp_value)  # Negative for descending order
+    
+    user_notifications.sort(key=sort_key)
 
     # Get published announcements
-    announcements = [a for a in announcements_list if a.published]
+    announcements = [a.content for a in announcements_list if a.published]
     responses = []
 
     context = {
@@ -724,13 +743,14 @@ def update_profile(
 @app.get("/register", tags=["Pet Management"])
 def read_register_pet_page(request: Request):
     """Renders the owned pet registration page."""
-    user_role = get_user_role(request)
+    user_role, current_user = resolve_user(request)
     
     status = request.query_params.get('status') # UPDATED: Get status parameter
     
     context = {
         "request": request,
         "user_role": user_role,
+        "current_user": current_user,
         "status": status # UPDATED: Pass status to template
     }
     return templates.TemplateResponse(name="pet_register.html", context=context)
@@ -787,9 +807,9 @@ def process_register_pet(
 @app.get("/report-animal", tags=["Pet Management"])
 def read_report_animal_page(request: Request):
     """Renders the animal reporting page."""
-    user_role = get_user_role(request)
+    user_role, current_user = resolve_user(request)
     status = request.query_params.get('status') # Added to read status
-    context = {"request": request, "user_role": user_role, "status": status}
+    context = {"request": request, "user_role": user_role, "current_user": current_user, "status": status}
     return templates.TemplateResponse(name="report_animal.html", context=context)
 
 @app.post("/report-animal", status_code=HTTP_303_SEE_OTHER, tags=["Pet Management"])
@@ -799,6 +819,7 @@ def process_report_animal(
     breed: str = Form(...),
     color: str = Form(...),
     species: Optional[str] = Form(None),  # Accept but not stored yet
+    report_type: str = Form("lost"),
     location_sighted: str = Form(...),
     reporter_contact: str = Form(...),
     date_last_seen: Optional[str] = Form(None),
@@ -825,6 +846,8 @@ def process_report_animal(
             location_data=location_sighted,
             vaccination_status=False, # Default to false for strays
             is_stray=True,
+            # mark as found if user reported a found animal
+            is_found=True if report_type == "found" else False,
             photo_url=photo_filename,
             reporter_contact=reporter_contact,
             reporter_user_id=reporter_user_id,
@@ -852,8 +875,8 @@ def process_report_animal(
 
 @app.get("/view-all-pets", tags=["Core Pages"])
 def read_view_pets_page(request: Request):
-    """Renders the page showing all approved pets and reports."""
-    user_role = get_user_role(request)
+    """Renders the page showing all approved owned pets (registered pets, not stray reports)."""
+    user_role, current_user = resolve_user(request)
     filter_breed = request.query_params.get("breed", "").lower()
     filter_color = request.query_params.get("color", "").lower()
     filter_location = request.query_params.get("location", "").lower()
@@ -862,11 +885,14 @@ def read_view_pets_page(request: Request):
     def matches(p: PetInDB) -> bool:
         return (filter_breed in p.breed.lower()) and (filter_color in p.color.lower()) and (filter_location in p.location_data.lower())
 
-    filtered = [p for p in approved_pets if matches(p)] if search_performed else []
+    # Only show owned pets (registered pets), not stray reports
+    owned_pets = [p for p in approved_pets if not p.is_stray]
+    filtered = [p for p in owned_pets if matches(p)] if search_performed else []
     context = {
         "request": request,
         "pets": filtered,  # template expects 'pets'
         "user_role": user_role,
+        "current_user": current_user,
         "search_performed": search_performed,
         "filters": {
             "breed": request.query_params.get("breed", ""),
@@ -875,6 +901,130 @@ def read_view_pets_page(request: Request):
         }
     }
     return templates.TemplateResponse( "view_pets.html", context) 
+
+
+@app.post("/adopt-request", status_code=HTTP_303_SEE_OTHER, tags=["Core Pages"])
+def process_adopt_request(request: Request, pet_id: str = Form(...)):
+    """Handles adoption requests and sends notification to pet owner."""
+    user_role, current_user = resolve_user(request)
+    if not current_user:
+        return RedirectResponse(url="/login?error=Login required to request adoption.", status_code=HTTP_303_SEE_OTHER)
+    
+    global notifications
+    try:
+        pet_uuid = UUID(pet_id)
+        # Find the pet in approved pets
+        pet = next((p for p in approved_pets if p.pet_id == pet_uuid), None)
+        
+        if not pet:
+            return RedirectResponse(url="/view-all-pets?error=Pet not found", status_code=HTTP_303_SEE_OTHER)
+        
+        # Check if pet has an owner user_id
+        if not pet.owner_user_id:
+            return RedirectResponse(url="/view-all-pets?error=Pet owner information not available", status_code=HTTP_303_SEE_OTHER)
+        
+        # Don't allow self-adoption
+        if str(pet.owner_user_id) == str(current_user.user_id):
+            return RedirectResponse(url="/view-all-pets?error=Cannot request adoption of your own pet", status_code=HTTP_303_SEE_OTHER)
+        
+        # Create notification for the pet owner
+        from datetime import datetime, timezone
+        adoption_notification = Notification(
+            notification_id=uuid4(),
+            user_id=pet.owner_user_id,
+            message=f"{current_user.full_name} ({current_user.email}) is interested in adopting {pet.name}. Please contact them at {current_user.contact_info or current_user.mobile_number or current_user.email}.",
+            read=False,
+            timestamp=datetime.now(timezone.utc).isoformat()
+        )
+        notifications.append(adoption_notification)
+        save_state()
+        
+        logs.append(f"Adoption request for '{pet.name}' from {current_user.full_name} to owner {pet.owner_user_id}")
+        save_state()
+        
+        return RedirectResponse(url="/view-all-pets?status=adoption_requested", status_code=HTTP_303_SEE_OTHER)
+    except ValueError:
+        return RedirectResponse(url="/view-all-pets?error=Invalid pet ID", status_code=HTTP_303_SEE_OTHER)
+    except Exception as e:
+        logs.append(f"Error processing adoption request: {e}")
+        save_state()
+        return RedirectResponse(url="/view-all-pets?error=Error processing request", status_code=HTTP_303_SEE_OTHER)
+
+
+@app.get("/lost", tags=["Core Pages"])
+def read_lost_pets_page(request: Request):
+    """List approved lost-pet reports."""
+    user_role, current_user = resolve_user(request)
+    filter_breed = request.query_params.get("breed", "").lower()
+    filter_color = request.query_params.get("color", "").lower()
+    filter_location = request.query_params.get("location", "").lower()
+    search_performed = any([filter_breed, filter_color, filter_location])
+
+    def matches(p: PetInDB) -> bool:
+        return (
+            filter_breed in (p.breed or "").lower()
+            and filter_color in (p.color or "").lower()
+            and filter_location in (p.location_data or "").lower()
+        )
+
+    pets = (
+        [p for p in approved_pets if p.is_stray and not p.is_found and matches(p)]
+        if search_performed
+        else []
+    )
+
+    context = {
+        "request": request,
+        "user_role": user_role,
+        "current_user": current_user,
+        "pets": pets,
+        "page_type": "lost",
+        "search_performed": search_performed,
+        "filters": {
+            "breed": request.query_params.get("breed", ""),
+            "color": request.query_params.get("color", ""),
+            "location": request.query_params.get("location", ""),
+        },
+    }
+    return templates.TemplateResponse("lost_found_list.html", context)
+
+
+@app.get("/found", tags=["Core Pages"])
+def read_found_pets_page(request: Request):
+    """List approved found-animal reports."""
+    user_role, current_user = resolve_user(request)
+    filter_breed = request.query_params.get("breed", "").lower()
+    filter_color = request.query_params.get("color", "").lower()
+    filter_location = request.query_params.get("location", "").lower()
+    search_performed = any([filter_breed, filter_color, filter_location])
+
+    def matches(p: PetInDB) -> bool:
+        return (
+            filter_breed in (p.breed or "").lower()
+            and filter_color in (p.color or "").lower()
+            and filter_location in (p.location_data or "").lower()
+        )
+
+    pets = (
+        [p for p in approved_pets if p.is_found and matches(p)]
+        if search_performed
+        else []
+    )
+
+    context = {
+        "request": request,
+        "user_role": user_role,
+        "current_user": current_user,
+        "pets": pets,
+        "page_type": "found",
+        "search_performed": search_performed,
+        "filters": {
+            "breed": request.query_params.get("breed", ""),
+            "color": request.query_params.get("color", ""),
+            "location": request.query_params.get("location", ""),
+        },
+    }
+    return templates.TemplateResponse("lost_found_list.html", context)
 
 
 # --- 5. Login/Register Endpoints ---
@@ -916,7 +1066,7 @@ def process_login(request: Request, username: str = Form(...), password: str = F
     # record failed attempt
     attempts.append(now_ts)
     LOGIN_ATTEMPTS[client_host] = attempts
-
+    
     return RedirectResponse(
         url="/login?error=Invalid+email+or+password.",
         status_code=HTTP_303_SEE_OTHER
@@ -967,14 +1117,14 @@ def process_user_registration(
             url="/user-register?error=You must accept the Terms and Conditions to register.",
             status_code=HTTP_303_SEE_OTHER
         )
-    
+
     # Check if user already exists
     if any(u.email == email for u in users):
         return RedirectResponse(
             url="/user-register?error=This email is already registered.",
             status_code=HTTP_303_SEE_OTHER
         )
-    
+
     # Handle profile photo upload
     profile_photo_url = None
     if profile_photo and profile_photo.filename:
@@ -990,7 +1140,7 @@ def process_user_registration(
     # Register the new user as a standard 'user' (General User role)
     new_user = UserAccount(
         user_id=uuid4(),
-        full_name=full_name,
+        full_name=full_name, 
         first_name=first_name,
         middle_name=middle_name,
         last_name=last_name,
@@ -1143,10 +1293,33 @@ def read_user_dashboard(request: Request):
         if scored:
             suggested_matches[str(lost.pet_id)] = [s[1] for s in scored]
 
-    # Notifications: basic derivation from logs and status updates related to user's pets/reports
-    notifications = []
+    # Notifications: Get actual notifications for the user from the notifications list
+    global notifications
+    user_notifications = [n for n in notifications if n.user_id and str(n.user_id) == str(current_user.user_id)]
+    
+    # Sort notifications: unread first, then by timestamp (newest first)
+    def sort_key(n):
+        # Unread notifications come first (False sorts before True)
+        read_priority = 0 if not n.read else 1
+        # Parse timestamp for sorting (newest first)
+        try:
+            if hasattr(n, 'timestamp') and n.timestamp:
+                ts = datetime.fromisoformat(n.timestamp.replace('Z', '+00:00'))
+                timestamp_value = ts.timestamp()
+            else:
+                timestamp_value = 0
+        except:
+            timestamp_value = 0
+        return (read_priority, -timestamp_value)  # Negative for descending order
+    
+    user_notifications.sort(key=sort_key)
+    
+    # Also add status updates related to user's pets/reports
+    status_notifications = []
     for p in (user_pets + user_lost_reports + user_found_reports):
-        notifications.append(f"{p.name}: status updated to {p.status}.")
+        status_notifications.append(f"{p.name}: status updated to {p.status}.")
+    # Combine both types of notifications (Notification objects first, then status strings)
+    all_notifications = user_notifications + status_notifications
     # Get published announcements
     announcements = [a for a in announcements_list if a.published]
 
@@ -1159,7 +1332,7 @@ def read_user_dashboard(request: Request):
         "user_found_reports": user_found_reports,
         "suggested_matches": suggested_matches,
         "suggestions_map": suggestions_map,
-        "notifications": notifications,
+        "notifications": all_notifications,
         "announcements": announcements,
         "filters": {"breed": "", "color": "", "location": ""}
     }
@@ -1304,6 +1477,38 @@ def read_admin_users(request: Request):
             "users": users,
         },
     )
+
+
+@app.post("/admin/users/delete", status_code=HTTP_303_SEE_OTHER, tags=["Admin Panel"])
+def delete_user(request: Request, user_id: str = Form(...)):
+    """Delete a user from the system."""
+    user_role, current_user = resolve_user(request)
+    if user_role != 'admin':
+        return RedirectResponse(url="/login?error=Admin access required.", status_code=HTTP_303_SEE_OTHER)
+    
+    global users
+    try:
+        user_uuid = UUID(user_id)
+        # Prevent deleting the current admin user
+        if str(user_uuid) == str(current_user.user_id):
+            return RedirectResponse(url="/admin/users?error=Cannot delete your own account", status_code=HTTP_303_SEE_OTHER)
+        
+        # Find and remove the user
+        user_to_delete = next((u for u in users if u.user_id == user_uuid), None)
+        if user_to_delete:
+            users.remove(user_to_delete)
+            save_state()
+            logs.append(f"Admin {current_user.full_name} deleted user {user_to_delete.full_name} ({user_to_delete.email})")
+            save_state()
+            return RedirectResponse(url="/admin/users?status=user_deleted", status_code=HTTP_303_SEE_OTHER)
+        else:
+            return RedirectResponse(url="/admin/users?error=User not found", status_code=HTTP_303_SEE_OTHER)
+    except ValueError:
+        return RedirectResponse(url="/admin/users?error=Invalid user ID", status_code=HTTP_303_SEE_OTHER)
+    except Exception as e:
+        logs.append(f"Error deleting user: {e}")
+        save_state()
+        return RedirectResponse(url="/admin/users?error=Error deleting user", status_code=HTTP_303_SEE_OTHER)
 
 
 @app.get("/admin/export/pets.csv", tags=["Admin Panel"])
@@ -1631,26 +1836,17 @@ def read_admin_pending(request: Request):
         return (filter_breed in p.breed.lower()) and (filter_color in p.color.lower()) and (filter_location in p.location_data.lower())
 
     pending_regs = [p for p in pending_pets if not p.is_stray and p.status == "pending" and matches(p)]
-    info_regs = [p for p in pending_pets if not p.is_stray and p.status == "info_needed" and matches(p)]
-    approved_regs = [p for p in approved_pets if not p.is_stray and matches(p)]
-
     pending_lost_reports = [p for p in pending_reports if p.is_stray and not p.is_found and p.status == "pending" and matches(p)]
     pending_found_reports = [p for p in pending_reports if p.is_found and p.status == "pending" and matches(p)]
     info_reports = [p for p in pending_reports if p.status == "info_needed" and matches(p)]
-    approved_reports = [p for p in approved_pets if p.is_stray and p.status == "approved" and matches(p)]
-    resolved_reports = [p for p in approved_pets if p.status == "resolved" and matches(p)]
 
     context = {
         "request": request,
         "current_user": current_user,
         "pending_regs": pending_regs,
-        "info_regs": info_regs,
-        "approved_regs": approved_regs,
         "pending_lost_reports": pending_lost_reports,
         "pending_found_reports": pending_found_reports,
         "info_reports": info_reports,
-        "approved_reports": approved_reports,
-        "resolved_reports": resolved_reports,
         "user_role": user_role,
         "status": status
     }
@@ -2026,29 +2222,35 @@ def submit_story(request: Request, rating: int = Form(...), feedback: str = Form
 # --- Approved Registration History ---
 
 @app.get("/admin/approved-history", tags=["Admin Panel"])
-
 def approved_registration_history_page(request: Request):
-
     """View approved registration history."""
-
     user_role, current_user = resolve_user(request)
-
     if user_role != 'admin':
-
         return RedirectResponse(url="/login?error=Admin access required.", status_code=HTTP_303_SEE_OTHER)
 
+    filter_breed = request.query_params.get("breed", "").lower()
+    filter_color = request.query_params.get("color", "").lower()
+    filter_location = request.query_params.get("location", "").lower()
+
+    def matches(p: PetInDB) -> bool:
+        return (filter_breed in p.breed.lower()) and (filter_color in p.color.lower()) and (filter_location in p.location_data.lower())
+
+    # Approved Registrations
+    approved_regs = [p for p in approved_pets if not p.is_stray and matches(p)]
+    # Approved Reports
+    approved_reports = [p for p in approved_pets if p.is_stray and p.status == "approved" and matches(p)]
+    # Resolved Reports
+    resolved_reports = [p for p in approved_pets if p.status == "resolved" and matches(p)]
+
     context = {
-
         "request": request,
-
         "user_role": user_role,
-
         "current_user": current_user,
-
-        "approved_history": sorted(approved_registration_history, key=lambda x: x.date_reported or "", reverse=True)
-
+        "approved_history": sorted(approved_registration_history, key=lambda x: x.date_reported or "", reverse=True),
+        "approved_regs": approved_regs,
+        "approved_reports": approved_reports,
+        "resolved_reports": resolved_reports,
     }
-
     return templates.TemplateResponse("admin_approved_history.html", context)
 
 

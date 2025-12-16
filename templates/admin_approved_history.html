@@ -25,7 +25,10 @@
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
                             <li class="nav-item"><a class="nav-link" href="/admin/pending">Pending Requests</a></li>
-                            <li class="nav-item"><a class="nav-link active" href="/admin/approved-history">Approved History</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/users">User Management</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/exports">Reports & Exports</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/announcements">Announcements</a></li>
+                            <li class="nav-item"><a class="nav-link active text-primary fw-bold" href="/admin/approved-history">Approved History</a></li>
                         </ul>
                         <div class="profile-dropdown-container">
                             <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
@@ -44,10 +47,119 @@
             <div class="container my-4">
                 {% include 'partials/back_button.html' %}
                 <div class="text-center mb-4">
-                    <h1 class="text-primary mb-2">Approved Registration History</h1>
-                    <p class="text-muted">View all approved pet registrations</p>
+                    <h1 class="text-primary mb-2">Approved History</h1>
+                    <p class="text-muted">View all approved registrations, reports, and resolved cases</p>
                 </div>
 
+                <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Approved Registrations ({{ approved_regs | length }})</h2>
+                {% if approved_regs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Pet Name</th>
+                                    <th>Breed</th>
+                                    <th>Color</th>
+                                    <th>Location</th>
+                                    <th>Owner</th>
+                                    <th>Contact</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pet in approved_regs %}
+                                    <tr>
+                                        <td>{{ pet.name }}</td>
+                                        <td>{{ pet.breed }}</td>
+                                        <td>{{ pet.color }}</td>
+                                        <td>{{ pet.location_data }}</td>
+                                        <td>{{ pet.owner_name or 'N/A' }}</td>
+                                        <td>{{ pet.owner_contact or 'N/A' }}</td>
+                                        <td><span class="badge bg-success">Approved</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        <p>No approved registrations</p>
+                    </div>
+                {% endif %}
+
+                <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Approved Reports ({{ approved_reports | length }})</h2>
+                {% if approved_reports %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Pet Name</th>
+                                    <th>Type</th>
+                                    <th>Breed</th>
+                                    <th>Color</th>
+                                    <th>Location</th>
+                                    <th>Reporter</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pet in approved_reports %}
+                                    <tr>
+                                        <td>{{ pet.name }}</td>
+                                        <td><span class="badge {% if pet.is_found %}bg-info{% else %}bg-warning{% endif %}">{% if pet.is_found %}Found{% else %}Lost{% endif %}</span></td>
+                                        <td>{{ pet.breed }}</td>
+                                        <td>{{ pet.color }}</td>
+                                        <td>{{ pet.location_data }}</td>
+                                        <td>{{ pet.reporter_contact or 'N/A' }}</td>
+                                        <td><span class="badge bg-success">Approved</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        <p>No approved reports</p>
+                    </div>
+                {% endif %}
+
+                <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Resolved Reports ({{ resolved_reports | length }})</h2>
+                {% if resolved_reports %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th>Pet Name</th>
+                                    <th>Type</th>
+                                    <th>Breed</th>
+                                    <th>Color</th>
+                                    <th>Location</th>
+                                    <th>Reporter</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pet in resolved_reports %}
+                                    <tr>
+                                        <td>{{ pet.name }}</td>
+                                        <td><span class="badge {% if pet.is_found %}bg-info{% else %}bg-warning{% endif %}">{% if pet.is_found %}Found{% else %}Lost{% endif %}</span></td>
+                                        <td>{{ pet.breed }}</td>
+                                        <td>{{ pet.color }}</td>
+                                        <td>{{ pet.location_data }}</td>
+                                        <td>{{ pet.reporter_contact or 'N/A' }}</td>
+                                        <td><span class="badge bg-secondary">Resolved</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        <p>No resolved reports</p>
+                    </div>
+                {% endif %}
+
+                <h2 class="mb-4 mt-5" style="color: var(--maroon-600);">Registration History Table</h2>
                 {% if approved_history %}
                     <div class="table-responsive">
                         <table class="table table-hover">

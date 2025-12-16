@@ -25,6 +25,8 @@
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                             <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/lost">Lost</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/found">Found</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
                             <li class="nav-item"><a class="nav-link active" href="/report-animal">Report Animal</a></li>
                         </ul>
@@ -299,7 +301,12 @@
                                 <div class="list-group">
                                     {% for n in notifications[:5] %}
                                         <div class="list-group-item">
-                                            <p class="mb-0 small">{{ n }}</p>
+                                            {% if n.message %}
+                                                <p class="mb-0 small">{{ n.message }}</p>
+                                                {% if n.timestamp %}<small class="text-muted">{{ n.timestamp }}</small>{% endif %}
+                                            {% else %}
+                                                <p class="mb-0 small">{{ n }}</p>
+                                            {% endif %}
                                         </div>
                                     {% endfor %}
                                 </div>

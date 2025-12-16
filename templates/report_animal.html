@@ -25,6 +25,8 @@
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                             <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/lost">Lost</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/found">Found</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
                             <li class="nav-item"><a class="nav-link active" href="/report-animal">Report Animal</a></li>
                             {% if user_role == 'admin' %}
@@ -72,14 +74,25 @@
                             <h3 class="text-primary mb-3">Animal Details</h3>
                             
                             <form method="POST" action="/report-animal" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label class="form-label d-block">Report Type <span class="text-danger">*</span></label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="report_type" id="report_type_lost" value="lost" checked>
+                                        <label class="form-check-label" for="report_type_lost">Lost</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="report_type" id="report_type_found" value="found">
+                                        <label class="form-check-label" for="report_type_found">Found</label>
+                                    </div>
+                                </div>
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-6">
                                         <label for="name" class="form-label">Animal Name <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="name" name="name" required placeholder="e.g., Max, Small White Kitten">
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="species" class="form-label">Species</label>
-                                        <select class="form-select" id="species" name="species">
+                                        <label for="species" class="form-label">Species <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="species" name="species" required>
                                             <option value="" disabled selected>Select Species</option>
                                             <option value="Dog">Dog</option>
                                             <option value="Cat">Cat</option>
@@ -104,8 +117,8 @@
 
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-6">
-                                        <label for="reporter_contact" class="form-label">Your Contact Info</label>
-                                        <input type="text" class="form-control" id="reporter_contact" name="reporter_contact" placeholder="e.g., 0917-xxxx-xxx or email">
+                                        <label for="reporter_contact" class="form-label">Your Contact Info <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="reporter_contact" name="reporter_contact" required placeholder="e.g., 0917-xxxx-xxx or email">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="location_sighted" class="form-label">Location Sighted/Found <span class="text-danger">*</span></label>
@@ -115,12 +128,12 @@
 
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-6">
-                                        <label for="date_last_seen" class="form-label">Date Last Seen / Found</label>
-                                        <input type="date" class="form-control" id="date_last_seen" name="date_last_seen">
+                                        <label for="date_last_seen" class="form-label">Date Last Seen / Found <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="date_last_seen" name="date_last_seen" required>
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="description" class="form-label">Description / Distinguishing Features</label>
-                                        <input type="text" class="form-control" id="description" name="description" placeholder="e.g., small scar on left ear, wears red collar">
+                                        <label for="description" class="form-label">Description / Distinguishing Features <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="description" name="description" required placeholder="e.g., small scar on left ear, wears red collar">
                                     </div>
                                 </div>
                                 

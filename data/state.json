@@ -89,24 +89,6 @@
       "gender": "male",
       "profile_photo_url": "/static/uploads/579c1161-20eb-463a-96ab-2cb0c48c9635.jpg",
       "mobile_number": "09925240493"
-    },
-    {
-      "user_id": "24ca3962-c343-4e72-b079-1f68f142cb91",
-      "full_name": "Jessica Sales",
-      "email": "jessica.sales.evsu@gmail.com",
-      "password": "$pbkdf2-sha256$29000$LAXAuJdSyvkfYyzFuBfifA$.CCTNtz4wzgzEOikRVz4BW8kZXqdycFIaTtuuZmW8L4",
-      "role": "user",
-      "birthday": "2003-10-24",
-      "address": "Brgy. Linao, Purok 2\r\nPurok CCF, Brgy. Linao, Ormoc City",
-      "contact_info": "+639205343636",
-      "notifications_enabled": true,
-      "privacy_public": true,
-      "first_name": "Jessica",
-      "middle_name": null,
-      "last_name": "Sales",
-      "gender": "female",
-      "profile_photo_url": null,
-      "mobile_number": "+639205343636"
     }
   ],
   "pending_reports": [],
@@ -146,6 +128,46 @@
       "owner_user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
       "reporter_user_id": null,
       "reporter_contact": null,
+      "status": "resolved",
+      "is_found": false,
+      "notes": [],
+      "date_reported": null,
+      "description": null
+    },
+    {
+      "pet_id": "61d5b49c-c58b-446e-ac95-67df0d4c33af",
+      "name": "Maui Wowie",
+      "breed": "Puspin",
+      "color": "White / Black",
+      "location_data": "Ormoc",
+      "vaccination_status": false,
+      "is_stray": true,
+      "photo_url": null,
+      "owner_name": null,
+      "owner_contact": null,
+      "owner_user_id": null,
+      "reporter_user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
+      "reporter_contact": "09465069981",
+      "status": "approved",
+      "is_found": false,
+      "notes": [],
+      "date_reported": "2025-10-24",
+      "description": "Small"
+    },
+    {
+      "pet_id": "57df2c70-11c3-46a6-9708-7402b612410a",
+      "name": "Max",
+      "breed": "Poodle",
+      "color": "Black",
+      "location_data": "Linao, OC",
+      "vaccination_status": true,
+      "is_stray": false,
+      "photo_url": "/static/uploads/8faa1a40-0a81-4450-b530-f7a9466e7568.jpg",
+      "owner_name": "Jessica Sales",
+      "owner_contact": "09465069981",
+      "owner_user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
+      "reporter_user_id": null,
+      "reporter_contact": null,
       "status": "approved",
       "is_found": false,
       "notes": [],
@@ -173,6 +195,26 @@
       "notes": [],
       "date_reported": null,
       "description": null
+    },
+    {
+      "pet_id": "57df2c70-11c3-46a6-9708-7402b612410a",
+      "name": "Max",
+      "breed": "Poodle",
+      "color": "Black",
+      "location_data": "Linao, OC",
+      "vaccination_status": true,
+      "is_stray": false,
+      "photo_url": "/static/uploads/8faa1a40-0a81-4450-b530-f7a9466e7568.jpg",
+      "owner_name": "Jessica Sales",
+      "owner_contact": "09465069981",
+      "owner_user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
+      "reporter_user_id": null,
+      "reporter_contact": null,
+      "status": "approved",
+      "is_found": false,
+      "notes": [],
+      "date_reported": null,
+      "description": null
     }
   ],
   "logs": [
@@ -189,7 +231,29 @@
     "Registered pet 'Luna' (owner: Jessica Sales) pending review.",
     "Approved 'Luna' (3eb3e411-2637-419d-9bc2-f419c1397d03).",
     "Notification added for user 95997287-fcac-49f1-91f0-d3423bf749e5: Your case/pet 'Luna' has been approved by admin.",
-    "New user registered: Jessica Sales (jessica.sales.evsu@gmail.com)"
+    "New user registered: Jessica Sales (jessica.sales.evsu@gmail.com)",
+    "Announcement 'drgdfg' created by admin.",
+    "Resolved 'Luna' (3eb3e411-2637-419d-9bc2-f419c1397d03).",
+    "Reported animal 'Maui Wowie' at Ormoc pending review.",
+    "Approved 'Maui Wowie' (61d5b49c-c58b-446e-ac95-67df0d4c33af).",
+    "Notification added for user 95997287-fcac-49f1-91f0-d3423bf749e5: Your case/pet 'Maui Wowie' has been approved by admin.",
+    "Adoption request for 'Luna' from Jessica Sales to owner 95997287-fcac-49f1-91f0-d3423bf749e5",
+    "Adoption request for 'Luna' from Jessica Sales to owner 95997287-fcac-49f1-91f0-d3423bf749e5",
+    "User user@purrpaws.com dismissed notification f28a3a98-ef23-437c-a8cf-a315a46f299a.",
+    "User user@purrpaws.com dismissed notification 37cea01a-3106-470b-9089-a91f2c741ec5.",
+    "User user@purrpaws.com dismissed notification 37cea01a-3106-470b-9089-a91f2c741ec5.",
+    "User user@purrpaws.com dismissed notification 37cea01a-3106-470b-9089-a91f2c741ec5.",
+    "User user@purrpaws.com dismissed notification 37cea01a-3106-470b-9089-a91f2c741ec5.",
+    "User user@purrpaws.com dismissed notification 172375d5-20b7-4d13-a730-21557962896b.",
+    "User user@purrpaws.com dismissed notification 7f828683-e077-42b9-8122-507cc0a59821.",
+    "Registered pet 'Max' (owner: Jessica Sales) pending review.",
+    "Approved 'Max' (57df2c70-11c3-46a6-9708-7402b612410a).",
+    "Notification added for user 95997287-fcac-49f1-91f0-d3423bf749e5: Your case/pet 'Max' has been approved by admin.",
+    "Adoption request for 'Max' from Jessica Sales to owner 95997287-fcac-49f1-91f0-d3423bf749e5",
+    "User user@purrpaws.com dismissed notification 0f9d250c-587d-41c3-b5d0-beecada9b368.",
+    "User user@purrpaws.com dismissed notification 9ad7869c-9737-46d5-b25f-a082915c6164.",
+    "User user@purrpaws.com dismissed notification db2929ef-0f54-41a5-a6f8-a2477f281acf.",
+    "Admin Admin User deleted user Jessica Sales (jessica.sales.evsu@gmail.com)"
   ],
   "notifications": [
     {
@@ -504,7 +568,7 @@
       "notification_id": "db2929ef-0f54-41a5-a6f8-a2477f281acf",
       "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
       "message": "Your case/pet 'Jessica Sales' has been approved by admin.",
-      "read": false,
+      "read": true,
       "timestamp": "2025-12-15T00:07:27.158563+00:00"
     },
     {
@@ -513,6 +577,41 @@
       "message": "Your case/pet 'Luna' has been approved by admin.",
       "read": false,
       "timestamp": "2025-12-15T07:20:08.701487+00:00"
+    },
+    {
+      "notification_id": "0f9d250c-587d-41c3-b5d0-beecada9b368",
+      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
+      "message": "Your case/pet 'Maui Wowie' has been approved by admin.",
+      "read": true,
+      "timestamp": "2025-12-16T17:00:30.324000+00:00"
+    },
+    {
+      "notification_id": "b0ef10dd-1de3-4d2a-b274-ae58a2f87d93",
+      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
+      "message": "Jessica Sales (xjammie143@gmail.com) is interested in adopting Luna. Please contact them at xjammie143@gmail.com.",
+      "read": false,
+      "timestamp": "2025-12-16T17:57:00.337200+00:00"
+    },
+    {
+      "notification_id": "9ad7869c-9737-46d5-b25f-a082915c6164",
+      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
+      "message": "Jessica Sales (xjammie143@gmail.com) is interested in adopting Luna. Please contact them at xjammie143@gmail.com.",
+      "read": true,
+      "timestamp": "2025-12-16T18:04:44.945943+00:00"
+    },
+    {
+      "notification_id": "5f87cd74-0c0e-4fa7-95b5-5aa6c8a45d1d",
+      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
+      "message": "Your case/pet 'Max' has been approved by admin.",
+      "read": false,
+      "timestamp": "2025-12-16T18:09:34.107265+00:00"
+    },
+    {
+      "notification_id": "12d1d074-1e36-4288-bae7-d4ea19c70224",
+      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
+      "message": "Jessica Sales (xjammie143@gmail.com) is interested in adopting Max. Please contact them at xjammie143@gmail.com.",
+      "read": false,
+      "timestamp": "2025-12-16T18:09:49.336927+00:00"
     }
   ],
   "announcements": [
@@ -530,6 +629,14 @@
       "content": "WHERE: Superdome\r\nWHEN: December 25, 2025",
       "created_by": "c2652500-7494-4568-9e63-2a0e8450d2bf",
       "created_at": "2025-12-15T07:15:52.138898+00:00",
+      "published": true
+    },
+    {
+      "announcement_id": "662f0e8a-17bd-4b08-9b6d-ea3caa108796",
+      "title": "drgdfg",
+      "content": "gfdgdf",
+      "created_by": "c2652500-7494-4568-9e63-2a0e8450d2bf",
+      "created_at": "2025-12-16T09:32:14.548216+00:00",
       "published": true
     }
   ],
