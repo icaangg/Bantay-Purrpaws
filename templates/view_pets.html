@@ -82,53 +82,56 @@
                     </form>
                 </div>
 
-                {% if pets %}
-                    <div class="row g-4">
-                        {% for pet in pets %}
-                            <div class="col-md-6 col-lg-4">
-                                <div class="pet-card">
-                                    {% if pet.photo_url %}
-                                        <img src="{{ pet.photo_url }}" alt="{{ pet.name }}">
-                                    {% else %}
-                                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
-                                            <span style="font-size: 3rem;">🐾</span>
-                                        </div>
-                                    {% endif %}
-                                    <div class="pet-card-body">
-                                        <span class="badge {% if pet.is_stray %}bg-warning{% else %}bg-success{% endif %} mb-2">
-                                            {% if pet.is_stray %}Stray Report{% else %}Owned Pet{% endif %}
-                                        </span>
-                                        <h5 class="text-primary mb-2">{{ pet.name }}</h5>
-                                        <p class="text-muted mb-2 small">{{ pet.breed }} • {{ pet.color }}</p>
-                                        <p class="mb-2 small"><strong>Location:</strong> {{ pet.location_data }}</p>
-                                        <div class="mb-2">
-                                            {% if pet.is_stray %}
-                                                <p class="mb-1 small"><strong>Reporter:</strong> {{ pet.reporter_contact or 'N/A' }}</p>
-                                            {% else %}
-                                                <p class="mb-1 small"><strong>Owner:</strong> {{ pet.owner_name or 'N/A' }}</p>
-                                                <p class="mb-1 small"><strong>Contact:</strong> {{ pet.owner_contact or 'N/A' }}</p>
-                                            {% endif %}
-                                        </div>
-                                        <div class="mb-2">
-                                            {% if pet.vaccination_status %}
-                                                <span class="badge bg-success">Vaccinated</span>
-                                            {% else %}
-                                                <span class="badge bg-warning">Not Vaccinated</span>
-                                            {% endif %}
+                {% if search_performed %}
+                    {% if pets %}
+                        <div class="row g-4">
+                            {% for pet in pets %}
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="pet-card">
+                                        {% if pet.photo_url %}
+                                            <img src="{{ pet.photo_url }}" alt="{{ pet.name }}">
+                                        {% else %}
+                                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                                <span style="font-size: 3rem;">🐾</span>
+                                            </div>
+                                        {% endif %}
+                                        <div class="pet-card-body">
+                                            <span class="badge {% if pet.is_stray %}bg-warning{% else %}bg-success{% endif %} mb-2">
+                                                {% if pet.is_stray %}Stray Report{% else %}Owned Pet{% endif %}
+                                            </span>
+                                            <h5 class="text-primary mb-2">{{ pet.name }}</h5>
+                                            <p class="text-muted mb-2 small">{{ pet.breed }} • {{ pet.color }}</p>
+                                            <p class="mb-2 small"><strong>Location:</strong> {{ pet.location_data }}</p>
+                                            <div class="mb-2">
+                                                {% if pet.is_stray %}
+                                                    <p class="mb-1 small"><strong>Reporter:</strong> {{ pet.reporter_contact or 'N/A' }}</p>
+                                                {% else %}
+                                                    <p class="mb-1 small"><strong>Owner:</strong> {{ pet.owner_name or 'N/A' }}</p>
+                                                    <p class="mb-1 small"><strong>Contact:</strong> {{ pet.owner_contact or 'N/A' }}</p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="mb-2">
+                                                {% if pet.vaccination_status %}
+                                                    <span class="badge bg-success">Vaccinated</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">Not Vaccinated</span>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
-                    </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="feature-box p-5 text-center">
+                            <h2 class="text-primary mb-3">No matching pets found</h2>
+                            <p class="mb-0">Try adjusting your filters to find a match.</p>
+                        </div>
+                    {% endif %}
                 {% else %}
                     <div class="feature-box p-5 text-center">
-                        <h2 class="text-primary mb-3">No Approved Pets Yet!</h2>
-                        <p class="mb-4">Use the registration or reporting pages to add a record.</p>
-                        <div class="d-flex gap-3 justify-content-center flex-wrap">
-                            <a href="/register" class="btn cta-primary">Register Pet</a>
-                            <a href="/report-animal" class="btn cta-secondary">Report Animal</a>
-                        </div>
+                        <h2 class="text-primary mb-3">Search to view pets</h2>
+                        <p class="mb-0">Use the filters above to find lost or found pets.</p>
                     </div>
                 {% endif %}
             </div>
