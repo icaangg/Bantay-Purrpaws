@@ -255,6 +255,69 @@
                     </div>
                 </div>
 
+                <!-- All Community Lost & Found Reports -->
+                <section class="feature-box p-4 mb-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                        <h2 class="text-primary mb-0">All Community Lost &amp; Found Reports</h2>
+                        <div class="d-flex gap-2">
+                            <a href="/lost" class="btn btn-sm cta-secondary">View Lost Page</a>
+                            <a href="/found" class="btn btn-sm cta-secondary">View Found Page</a>
+                        </div>
+                    </div>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h4 class="mb-3 text-primary">All Lost Reports</h4>
+                            {% if community_lost_reports %}
+                                <div class="list-group">
+                                    {% for r in community_lost_reports[:5] %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="text-primary mb-1">{{ r.name }}</h6>
+                                                    <p class="mb-1 small text-muted">{{ r.location_data }}</p>
+                                                    <span class="badge 
+                                                        {% if r.status == 'approved' %}bg-success
+                                                        {% elif r.status == 'pending' %}bg-warning
+                                                        {% else %}bg-secondary{% endif %}">
+                                                        {{ r.status }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info mb-0">No lost reports in the system yet.</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="mb-3 text-primary">All Found Reports</h4>
+                            {% if community_found_reports %}
+                                <div class="list-group">
+                                    {% for r in community_found_reports[:5] %}
+                                        <div class="list-group-item">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div class="flex-grow-1">
+                                                    <h6 class="text-primary mb-1">{{ r.name }}</h6>
+                                                    <p class="mb-1 small text-muted">{{ r.location_data }}</p>
+                                                    <span class="badge 
+                                                        {% if r.status == 'approved' %}bg-success
+                                                        {% elif r.status == 'pending' %}bg-warning
+                                                        {% else %}bg-secondary{% endif %}">
+                                                        {{ r.status }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info mb-0">No found reports in the system yet.</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Suggested Matches -->
                 {% if suggested_matches %}
                     <section class="feature-box p-4 mb-4">

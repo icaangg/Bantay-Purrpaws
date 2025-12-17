@@ -284,14 +284,46 @@
                         <h2 class="mb-0">Community Stories</h2>
                         <a href="/community-stories" class="btn cta-primary">View All Stories</a>
                     </div>
-                    <div class="feature-box p-4 text-center">
-                        {% if user_role != 'guest' %}
-                            <p class="mb-3 text-muted">No community stories to show yet.</p>
-                            <a href="/community-stories" class="btn cta-primary">Share Your Story</a>
-                        {% else %}
-                            <p class="mb-0 text-muted">Want to share your experience? <a href="/login" class="text-primary">Login</a> or <a href="/user-register" class="text-primary">Sign Up</a> to submit your feedback.</p>
-                        {% endif %}
-                    </div>
+                    {% if homepage_reviews %}
+                        <div class="row g-4">
+                            {% for story in homepage_reviews %}
+                                <div class="col-md-4">
+                                    <div class="feature-box p-4 h-100">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h5 class="mb-0 text-primary">{{ story.user_name }}</h5>
+                                            <div>
+                                                {% for i in range(1, 6) %}
+                                                    {% if i <= story.rating %}
+                                                        <span class="text-warning">⭐</span>
+                                                    {% else %}
+                                                        <span class="text-muted">☆</span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <p class="text-muted small mb-2">{{ story.created_at[:10] }}</p>
+                                        <p class="mb-0">{{ story.feedback }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-4 text-center">
+                            {% if user_role != 'guest' %}
+                                <a href="/community-stories" class="btn cta-primary">Share Your Story</a>
+                            {% else %}
+                                <p class="mb-0 text-muted">Want to share your experience? <a href="/login" class="text-primary">Login</a> or <a href="/user-register" class="text-primary">Sign Up</a> to submit your feedback.</p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="feature-box p-4 text-center">
+                            {% if user_role != 'guest' %}
+                                <p class="mb-3 text-muted">No community stories to show yet.</p>
+                                <a href="/community-stories" class="btn cta-primary">Share Your Story</a>
+                            {% else %}
+                                <p class="mb-0 text-muted">Want to share your experience? <a href="/login" class="text-primary">Login</a> or <a href="/user-register" class="text-primary">Sign Up</a> to submit your feedback.</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             </section>
 

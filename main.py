@@ -562,6 +562,9 @@ def read_root(request: Request):
     recent_lost = sorted([p for p in pending_reports if p.is_stray and not p.is_found], key=lambda x: x.date_reported or "", reverse=True)[:4]
     recent_found = sorted([p for p in pending_reports if p.is_found], key=lambda x: x.date_reported or "", reverse=True)[:4]
 
+    # Prominently feature recent community reviews on the homepage
+    homepage_reviews = sorted(community_stories, key=lambda x: x.created_at, reverse=True)[:3]
+
     context = {
         "request": request,
         "user_role": user_role,
@@ -571,6 +574,7 @@ def read_root(request: Request):
         "stats": stats,
         "recent_lost": recent_lost,
         "recent_found": recent_found,
+        "homepage_reviews": homepage_reviews,
     }
     return templates.TemplateResponse("home.html", context)
 
@@ -1268,6 +1272,10 @@ def read_user_dashboard(request: Request):
     user_lost_reports = [p for p in (pending_reports + approved_pets) if p.is_stray and reporter_matches(p)]
     user_found_reports = [p for p in (pending_reports + approved_pets) if p.is_found and reporter_matches(p)]
 
+    # All community lost & found reports for visibility and tracking
+    community_lost_reports = [p for p in (pending_reports + approved_pets) if p.is_stray and not p.is_found]
+    community_found_reports = [p for p in (pending_reports + approved_pets) if p.is_found]
+
     # Suggested matches: naive heuristic (breed or color matches)
     suggested_matches = {}
     suggestions_map = {}
@@ -1330,6 +1338,8 @@ def read_user_dashboard(request: Request):
         "user_pets": user_pets,
         "user_lost_reports": user_lost_reports,
         "user_found_reports": user_found_reports,
+        "community_lost_reports": community_lost_reports,
+        "community_found_reports": community_found_reports,
         "suggested_matches": suggested_matches,
         "suggestions_map": suggestions_map,
         "notifications": all_notifications,
