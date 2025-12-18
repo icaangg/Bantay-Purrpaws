@@ -115,26 +115,6 @@
       "description": null
     },
     {
-      "pet_id": "3eb3e411-2637-419d-9bc2-f419c1397d03",
-      "name": "Luna",
-      "breed": "Persian",
-      "color": "White",
-      "location_data": "Linao, OC",
-      "vaccination_status": true,
-      "is_stray": false,
-      "photo_url": "/static/uploads/14cf62e2-0ee5-4696-af94-d9390e3101ea.jpg",
-      "owner_name": "Jessica Sales",
-      "owner_contact": "09465069981",
-      "owner_user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "reporter_user_id": null,
-      "reporter_contact": null,
-      "status": "resolved",
-      "is_found": false,
-      "notes": [],
-      "date_reported": null,
-      "description": null
-    },
-    {
       "pet_id": "61d5b49c-c58b-446e-ac95-67df0d4c33af",
       "name": "Maui Wowie",
       "breed": "Puspin",
@@ -155,16 +135,16 @@
       "description": "Small"
     },
     {
-      "pet_id": "57df2c70-11c3-46a6-9708-7402b612410a",
-      "name": "Max",
-      "breed": "Poodle",
-      "color": "Black",
-      "location_data": "Linao, OC",
+      "pet_id": "31db113e-e652-439d-bbc2-38e9616cec55",
+      "name": "Yen",
+      "breed": "Domestic Shorthair",
+      "color": "Orange",
+      "location_data": "Brgy. Linao, OC",
       "vaccination_status": true,
       "is_stray": false,
-      "photo_url": "/static/uploads/8faa1a40-0a81-4450-b530-f7a9466e7568.jpg",
+      "photo_url": "/static/uploads/427ac2d1-d648-41f7-848b-8ea4c062064d.jpg",
       "owner_name": "Jessica Sales",
-      "owner_contact": "09465069981",
+      "owner_contact": "N/A",
       "owner_user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
       "reporter_user_id": null,
       "reporter_contact": null,
@@ -301,7 +281,16 @@
     "User user@purrpaws.com dismissed notification 9e149e5b-4f39-453e-99f7-5cea7218bdff.",
     "User user@purrpaws.com dismissed notification 3c4e4789-28d1-4bb0-9e65-1b0829f887ef.",
     "User user@purrpaws.com dismissed notification deaccc2c-1967-4fca-b7da-13701b0446a5.",
-    "User user@purrpaws.com dismissed notification 9d4f4d12-1f13-4a9f-bed3-72e8cefe5c41."
+    "User user@purrpaws.com dismissed notification 9d4f4d12-1f13-4a9f-bed3-72e8cefe5c41.",
+    "Registered pet 'Yen' (owner: Jessica Sales) pending review.",
+    "User user@purrpaws.com deleted pet Yen.",
+    "Registered pet 'Yen' (owner: Jessica Sales) pending review.",
+    "User user@purrpaws.com deleted pet Luna.",
+    "Registered pet 'Yen' (owner: Jessica Sales) - automatically approved and added to View Pets.",
+    "User user@purrpaws.com deleted pet Yen.",
+    "User user@purrpaws.com deleted pet Yen.",
+    "User user@purrpaws.com deleted pet Max.",
+    "Registered pet 'Yen' (owner: Jessica Sales) - automatically approved and added to View Pets."
   ],
   "notifications": [
     {

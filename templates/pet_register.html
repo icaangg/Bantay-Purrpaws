@@ -77,7 +77,7 @@
                     <div class="feature-box p-4 p-md-5">
                         {% if status == 'registered' %}
                             <div class="alert alert-success">
-                                Registration received! Your pet is now awaiting admin review.
+                                Registration successful! Your pet has been automatically added to View Pets.
                             </div>
                         {% endif %}
                         
@@ -104,11 +104,67 @@
                             <div class="row g-3 mb-3">
                                 <div class="col-md-6">
                                     <label for="breed" class="form-label">Breed <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="breed" name="breed" required placeholder="e.g., Beagle, Persian, Mixed">
+                                    <select class="form-select" id="breed" name="breed" required>
+                                        <option value="" disabled selected>Select Breed</option>
+                                        <optgroup label="Dog Breeds">
+                                            <option value="Labrador Retriever">Labrador Retriever</option>
+                                            <option value="Golden Retriever">Golden Retriever</option>
+                                            <option value="German Shepherd">German Shepherd</option>
+                                            <option value="Bulldog">Bulldog</option>
+                                            <option value="Beagle">Beagle</option>
+                                            <option value="Poodle">Poodle</option>
+                                            <option value="Rottweiler">Rottweiler</option>
+                                            <option value="Yorkshire Terrier">Yorkshire Terrier</option>
+                                            <option value="Dachshund">Dachshund</option>
+                                            <option value="Siberian Husky">Siberian Husky</option>
+                                            <option value="Shih Tzu">Shih Tzu</option>
+                                            <option value="Boxer">Boxer</option>
+                                            <option value="Chihuahua">Chihuahua</option>
+                                            <option value="Pomeranian">Pomeranian</option>
+                                            <option value="Cocker Spaniel">Cocker Spaniel</option>
+                                            <option value="Mixed Breed">Mixed Breed</option>
+                                            <option value="Other">Other</option>
+                                        </optgroup>
+                                        <optgroup label="Cat Breeds">
+                                            <option value="Persian">Persian</option>
+                                            <option value="Siamese">Siamese</option>
+                                            <option value="Maine Coon">Maine Coon</option>
+                                            <option value="British Shorthair">British Shorthair</option>
+                                            <option value="Ragdoll">Ragdoll</option>
+                                            <option value="Bengal">Bengal</option>
+                                            <option value="American Shorthair">American Shorthair</option>
+                                            <option value="Scottish Fold">Scottish Fold</option>
+                                            <option value="Sphynx">Sphynx</option>
+                                            <option value="Russian Blue">Russian Blue</option>
+                                            <option value="Domestic Shorthair">Domestic Shorthair</option>
+                                            <option value="Domestic Longhair">Domestic Longhair</option>
+                                            <option value="Mixed Breed">Mixed Breed</option>
+                                            <option value="Other">Other</option>
+                                        </optgroup>
+                                    </select>
                                 </div>
                                 <div class="col-md-6">
                                     <label for="color" class="form-label">Primary Color <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="color" name="color" required placeholder="e.g., Brown, Calico, Black/White">
+                                    <select class="form-select" id="color" name="color" required>
+                                        <option value="" disabled selected>Select Color</option>
+                                        <option value="Black">Black</option>
+                                        <option value="White">White</option>
+                                        <option value="Brown">Brown</option>
+                                        <option value="Tan">Tan</option>
+                                        <option value="Gray">Gray</option>
+                                        <option value="Orange">Orange</option>
+                                        <option value="Cream">Cream</option>
+                                        <option value="Red">Red</option>
+                                        <option value="Golden">Golden</option>
+                                        <option value="Calico">Calico</option>
+                                        <option value="Tortoiseshell">Tortoiseshell</option>
+                                        <option value="Black and White">Black and White</option>
+                                        <option value="Brown and White">Brown and White</option>
+                                        <option value="Tri-color">Tri-color</option>
+                                        <option value="Spotted">Spotted</option>
+                                        <option value="Brindle">Brindle</option>
+                                        <option value="Other">Other</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -123,23 +179,15 @@
                             </div>
                             
                             <hr class="my-4">
-                            <h3 class="text-primary mb-3">Owner & Location Details</h3>
-
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <label for="owner_name" class="form-label">Owner's Full Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="owner_name" name="owner_name" required placeholder="e.g., Juan Dela Cruz">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="owner_contact" class="form-label">Owner's Contact Info <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="owner_contact" name="owner_contact" required placeholder="e.g., 0917-xxxx-xxx or email">
-                                </div>
+                            <h3 class="text-primary mb-3">Owner Information</h3>
+                            {% if user_role != 'guest' and current_user %}
+                            <div class="alert alert-info mb-3">
+                                <strong>Your Information:</strong> {{ current_user.full_name }} • {{ current_user.mobile_number or current_user.email }}
+                                {% if current_user.address %}
+                                <br><strong>Address:</strong> {{ current_user.address }}
+                                {% endif %}
                             </div>
-
-                            <div class="mb-3">
-                                <label for="location_registered" class="form-label">Pet's Home Location/Area <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="location_registered" name="location_registered" required placeholder="e.g., Barangay 1, near main street" autocomplete="off">
-                            </div>
+                            {% endif %}
                             
                             <div class="mb-4">
                                 <label for="photo_file" class="form-label">Upload Pet Photo (Optional)</label>
@@ -207,34 +255,5 @@
     </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFw0Qbyq9zTFTd-tUY6d-s6U4iYb5J3ZQ&libraries=places"></script>
-<script>
-    // Initialize Google Places Autocomplete for location field
-    function initAutocomplete() {
-        const locationInput = document.getElementById('location_registered');
-        if (locationInput) {
-            const autocomplete = new google.maps.places.Autocomplete(locationInput, {
-                types: ['geocode', 'establishment'],
-                componentRestrictions: { country: ['ph'] } // Restrict to Philippines
-            });
-            autocomplete.addListener('place_changed', function() {
-                const place = autocomplete.getPlace();
-                if (place.formatted_address) {
-                    locationInput.value = place.formatted_address;
-                }
-            });
-        }
-    }
-    // Initialize when page loads
-    if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-        initAutocomplete();
-    } else {
-        window.addEventListener('load', function() {
-            if (typeof google !== 'undefined' && google.maps && google.maps.places) {
-                initAutocomplete();
-            }
-        });
-    }
-</script>
 </body>
 </html>

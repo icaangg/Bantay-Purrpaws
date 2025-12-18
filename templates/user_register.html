@@ -101,9 +101,105 @@
                                     <input type="tel" class="form-control" id="mobile_number" name="mobile_number" required placeholder="e.g., +63 912 345 6789">
                                 </div>
 
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="province" class="form-label">Province <span class="text-muted">(Optional)</span></label>
+                                        <select class="form-select" id="province" name="province">
+                                            <option value="" selected>Select Province</option>
+                                            <option value="Metro Manila">Metro Manila</option>
+                                            <option value="Abra">Abra</option>
+                                            <option value="Agusan del Norte">Agusan del Norte</option>
+                                            <option value="Agusan del Sur">Agusan del Sur</option>
+                                            <option value="Aklan">Aklan</option>
+                                            <option value="Albay">Albay</option>
+                                            <option value="Antique">Antique</option>
+                                            <option value="Apayao">Apayao</option>
+                                            <option value="Aurora">Aurora</option>
+                                            <option value="Basilan">Basilan</option>
+                                            <option value="Bataan">Bataan</option>
+                                            <option value="Batanes">Batanes</option>
+                                            <option value="Batangas">Batangas</option>
+                                            <option value="Benguet">Benguet</option>
+                                            <option value="Biliran">Biliran</option>
+                                            <option value="Bohol">Bohol</option>
+                                            <option value="Bukidnon">Bukidnon</option>
+                                            <option value="Bulacan">Bulacan</option>
+                                            <option value="Cagayan">Cagayan</option>
+                                            <option value="Camarines Norte">Camarines Norte</option>
+                                            <option value="Camarines Sur">Camarines Sur</option>
+                                            <option value="Camiguin">Camiguin</option>
+                                            <option value="Capiz">Capiz</option>
+                                            <option value="Catanduanes">Catanduanes</option>
+                                            <option value="Cavite">Cavite</option>
+                                            <option value="Cebu">Cebu</option>
+                                            <option value="Compostela Valley">Compostela Valley</option>
+                                            <option value="Cotabato">Cotabato</option>
+                                            <option value="Davao del Norte">Davao del Norte</option>
+                                            <option value="Davao del Sur">Davao del Sur</option>
+                                            <option value="Davao Occidental">Davao Occidental</option>
+                                            <option value="Davao Oriental">Davao Oriental</option>
+                                            <option value="Dinagat Islands">Dinagat Islands</option>
+                                            <option value="Eastern Samar">Eastern Samar</option>
+                                            <option value="Guimaras">Guimaras</option>
+                                            <option value="Ifugao">Ifugao</option>
+                                            <option value="Ilocos Norte">Ilocos Norte</option>
+                                            <option value="Ilocos Sur">Ilocos Sur</option>
+                                            <option value="Iloilo">Iloilo</option>
+                                            <option value="Isabela">Isabela</option>
+                                            <option value="Kalinga">Kalinga</option>
+                                            <option value="La Union">La Union</option>
+                                            <option value="Laguna">Laguna</option>
+                                            <option value="Lanao del Norte">Lanao del Norte</option>
+                                            <option value="Lanao del Sur">Lanao del Sur</option>
+                                            <option value="Leyte">Leyte</option>
+                                            <option value="Maguindanao">Maguindanao</option>
+                                            <option value="Marinduque">Marinduque</option>
+                                            <option value="Masbate">Masbate</option>
+                                            <option value="Misamis Occidental">Misamis Occidental</option>
+                                            <option value="Misamis Oriental">Misamis Oriental</option>
+                                            <option value="Mountain Province">Mountain Province</option>
+                                            <option value="Negros Occidental">Negros Occidental</option>
+                                            <option value="Negros Oriental">Negros Oriental</option>
+                                            <option value="Northern Samar">Northern Samar</option>
+                                            <option value="Nueva Ecija">Nueva Ecija</option>
+                                            <option value="Nueva Vizcaya">Nueva Vizcaya</option>
+                                            <option value="Occidental Mindoro">Occidental Mindoro</option>
+                                            <option value="Oriental Mindoro">Oriental Mindoro</option>
+                                            <option value="Palawan">Palawan</option>
+                                            <option value="Pampanga">Pampanga</option>
+                                            <option value="Pangasinan">Pangasinan</option>
+                                            <option value="Quezon">Quezon</option>
+                                            <option value="Quirino">Quirino</option>
+                                            <option value="Rizal">Rizal</option>
+                                            <option value="Romblon">Romblon</option>
+                                            <option value="Samar">Samar</option>
+                                            <option value="Sarangani">Sarangani</option>
+                                            <option value="Siquijor">Siquijor</option>
+                                            <option value="Sorsogon">Sorsogon</option>
+                                            <option value="South Cotabato">South Cotabato</option>
+                                            <option value="Southern Leyte">Southern Leyte</option>
+                                            <option value="Sultan Kudarat">Sultan Kudarat</option>
+                                            <option value="Sulu">Sulu</option>
+                                            <option value="Surigao del Norte">Surigao del Norte</option>
+                                            <option value="Surigao del Sur">Surigao del Sur</option>
+                                            <option value="Tarlac">Tarlac</option>
+                                            <option value="Tawi-Tawi">Tawi-Tawi</option>
+                                            <option value="Zambales">Zambales</option>
+                                            <option value="Zamboanga del Norte">Zamboanga del Norte</option>
+                                            <option value="Zamboanga del Sur">Zamboanga del Sur</option>
+                                            <option value="Zamboanga Sibugay">Zamboanga Sibugay</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="city" class="form-label">City/Municipality <span class="text-muted">(Optional)</span></label>
+                                        <select class="form-select" id="city" name="city" disabled>
+                                            <option value="" selected>Select Province First</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="mb-3">
-                                    <label for="address" class="form-label">Address or City/Municipality <span class="text-muted">(Optional)</span></label>
-                                    <textarea class="form-control" id="address" name="address" rows="3" placeholder="e.g., Quezon City, Metro Manila"></textarea>
+                                    <label for="address" class="form-label">Street Address <span class="text-muted">(Optional)</span></label>
+                                    <input type="text" class="form-control" id="address" name="address" placeholder="e.g., Street name, Barangay" autocomplete="off">
                                 </div>
                             </div>
 
@@ -135,10 +231,24 @@
                             <!-- Terms and Conditions -->
                             <div class="feature-box p-4 mb-4">
                                 <h2 class="text-primary mb-3">4. Terms and Conditions</h2>
+                                <div class="mb-3 p-3 bg-light rounded" style="max-height: 200px; overflow-y: auto;">
+                                    <h6 class="fw-bold mb-2">Terms and Conditions</h6>
+                                    <div id="termsContent" style="display: none;">
+                                        <p class="small mb-2"><strong>1. Account Responsibility:</strong> You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
+                                        <p class="small mb-2"><strong>2. Pet Information Accuracy:</strong> You agree to provide accurate and truthful information about your pets. False information may result in account suspension.</p>
+                                        <p class="small mb-2"><strong>3. Data Privacy:</strong> We collect and store your personal information in accordance with our Privacy Policy. Your contact information may be shared with other users for pet adoption or reporting purposes.</p>
+                                        <p class="small mb-2"><strong>4. Community Guidelines:</strong> You agree to use the platform respectfully and not to post inappropriate content, spam, or misleading information.</p>
+                                        <p class="small mb-2"><strong>5. Pet Ownership:</strong> By registering a pet, you confirm that you are the legal owner or have authorization to register the pet on behalf of the owner.</p>
+                                        <p class="small mb-2"><strong>6. Platform Usage:</strong> This platform is for legitimate pet management purposes only. Misuse of the platform may result in account termination.</p>
+                                        <p class="small mb-2"><strong>7. Limitation of Liability:</strong> BantayPurrPaws is not responsible for any disputes, losses, or damages arising from pet adoptions, reports, or interactions between users.</p>
+                                        <p class="small mb-2"><strong>8. Modifications:</strong> We reserve the right to modify these terms at any time. Continued use of the platform constitutes acceptance of modified terms.</p>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-link p-0 text-primary" id="readMoreBtn" onclick="toggleTerms()">Read More</button>
+                                </div>
                                 <div class="form-check p-3 bg-light rounded">
                                     <input class="form-check-input" type="checkbox" id="terms_accepted" name="terms_accepted" required>
                                     <label class="form-check-label" for="terms_accepted">
-                                        I have read and agree to the <a href="#" target="_blank" class="text-primary">Terms and Conditions</a> and <a href="#" target="_blank" class="text-primary">Privacy Policy</a> of BantayPurrPaws. <span class="text-danger">*</span>
+                                        I have read and agree to the Terms and Conditions and <a href="#" target="_blank" class="text-primary">Privacy Policy</a> of BantayPurrPaws. <span class="text-danger">*</span>
                                     </label>
                                 </div>
                             </div>
@@ -265,7 +375,65 @@
                 return false;
             }
         });
+
+        // Toggle Terms and Conditions read more
+        function toggleTerms() {
+            const termsContent = document.getElementById('termsContent');
+            const readMoreBtn = document.getElementById('readMoreBtn');
+            if (termsContent.style.display === 'none') {
+                termsContent.style.display = 'block';
+                readMoreBtn.textContent = 'Read Less';
+            } else {
+                termsContent.style.display = 'none';
+                readMoreBtn.textContent = 'Read More';
+            }
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Philippines Provinces and Cities Data
+        const phProvincesCities = {
+            "Metro Manila": ["Manila", "Quezon City", "Caloocan", "Las Piñas", "Makati", "Malabon", "Mandaluyong", "Marikina", "Muntinlupa", "Navotas", "Parañaque", "Pasay", "Pasig", "Pateros", "San Juan", "Taguig", "Valenzuela"],
+            "Abra": ["Bangued", "Boliney", "Bucay", "Bucloc", "Daguioman", "Danglas", "Dolores", "La Paz", "Lacub", "Lagangilang", "Lagayan", "Langiden", "Licuan-Baay", "Luba", "Malibcong", "Manabo", "Peñarrubia", "Pidigan", "Pilar", "Sallapadan", "San Isidro", "San Juan", "San Quintin", "Tayum", "Tineg", "Tubo", "Villaviciosa"],
+            "Batangas": ["Batangas City", "Lipa City", "Tanauan City", "Bauan", "Calaca", "Lemery", "Nasugbu", "Taal", "Balayan", "Calatagan", "Lian", "Tuy", "Alitagtag", "Cuenca", "Ibaan", "Laurel", "Mataasnakahoy", "Padre Garcia", "Rosario", "San Jose", "San Juan", "San Luis", "San Nicolas", "San Pascual", "Santo Tomas", "Talisay", "Taysan"],
+            "Bulacan": ["Malolos City", "Meycauayan City", "San Jose del Monte City", "Angat", "Balagtas", "Baliuag", "Bocaue", "Bulakan", "Bustos", "Calumpit", "Doña Remedios Trinidad", "Guiguinto", "Hagonoy", "Marilao", "Norzagaray", "Obando", "Pandi", "Paombong", "Plaridel", "Pulilan", "San Ildefonso", "San Miguel", "San Rafael", "Santa Maria"],
+            "Cavite": ["Bacoor", "Cavite City", "Dasmariñas City", "Imus City", "Tagaytay City", "Trece Martires City", "Alfonso", "Amadeo", "Carmona", "General Mariano Alvarez", "General Trias", "Indang", "Kawit", "Magallanes", "Maragondon", "Mendez", "Naic", "Noveleta", "Rosario", "Silang", "Tanza", "Ternate"],
+            "Laguna": ["Calamba City", "San Pablo City", "Santa Rosa City", "Biñan City", "Cabuyao City", "Alaminos", "Bay", "Calauan", "Cavinti", "Famy", "Kalayaan", "Liliw", "Los Baños", "Luisiana", "Lumban", "Mabitac", "Magdalena", "Majayjay", "Nagcarlan", "Paete", "Pagsanjan", "Pakil", "Pangil", "Pila", "Rizal", "San Pedro", "Santa Cruz", "Santa Maria", "Siniloan", "Victoria"],
+            "Pampanga": ["Angeles City", "San Fernando City", "Apalit", "Arayat", "Bacolor", "Candaba", "Floridablanca", "Guagua", "Lubao", "Mabalacat", "Macabebe", "Magalang", "Masantol", "Mexico", "Minalin", "Porac", "San Luis", "San Simon", "Santa Ana", "Santa Rita", "Santo Tomas", "Sasmuan"],
+            "Rizal": ["Antipolo City", "Angono", "Baras", "Binangonan", "Cainta", "Cardona", "Jalajala", "Morong", "Pililla", "Rodriguez", "San Mateo", "Tanay", "Taytay", "Teresa"],
+            "Quezon": ["Lucena City", "Tayabas City", "Agdangan", "Alabat", "Atimonan", "Buenavista", "Burdeos", "Calauag", "Candelaria", "Catanauan", "Dolores", "General Luna", "General Nakar", "Guinayangan", "Gumaca", "Infanta", "Jomalig", "Lopez", "Lucban", "Macalelon", "Mauban", "Mulanay", "Padre Burgos", "Pagbilao", "Panukulan", "Patnanungan", "Perez", "Pitogo", "Plaridel", "Polillo", "Quezon", "Real", "Sampaloc", "San Andres", "San Antonio", "San Francisco", "San Narciso", "Sariaya", "Tagkawayan", "Tiaong", "Unisan"],
+            "Cebu": ["Cebu City", "Lapu-Lapu City", "Mandaue City", "Talisay City", "Toledo City", "Alcantara", "Alcoy", "Alegria", "Aloguinsan", "Argao", "Asturias", "Badian", "Balamban", "Bantayan", "Barili", "Boljoon", "Borbon", "Carmen", "Catmon", "Compostela", "Consolacion", "Cordova", "Daanbantayan", "Dalaguete", "Danao", "Dumanjug", "Ginatilan", "Liloan", "Madridejos", "Malabuyoc", "Medellin", "Minglanilla", "Moalboal", "Oslob", "Pilar", "Pinamungajan", "Poro", "Ronda", "Samboan", "San Fernando", "San Francisco", "San Remigio", "Santa Fe", "Santander", "Sibonga", "Sogod", "Tabogon", "Tabuelan", "Tuburan", "Tudela"],
+            "Davao del Sur": ["Davao City", "Digos City", "Bansalan", "Don Marcelino", "Hagonoy", "Jose Abad Santos", "Kiblawan", "Magsaysay", "Malalag", "Malita", "Matanao", "Padada", "Santa Cruz", "Santa Maria", "Sarangani", "Sulop"],
+            "Iloilo": ["Iloilo City", "Passi City", "Ajuy", "Alimodian", "Anilao", "Badiangan", "Balasan", "Banate", "Barotac Nuevo", "Barotac Viejo", "Batad", "Bingawan", "Cabatuan", "Calinog", "Carles", "Concepcion", "Dingle", "Dueñas", "Dumangas", "Estancia", "Guimbal", "Igbaras", "Janiuay", "Lambunao", "Leganes", "Lemery", "Leon", "Maasin", "Miagao", "Mina", "New Lucena", "Oton", "Pavia", "Pototan", "San Dionisio", "San Enrique", "San Joaquin", "San Miguel", "San Rafael", "Santa Barbara", "Sara", "Tigbauan", "Tubungan", "Zarraga"],
+            "Negros Occidental": ["Bacolod City", "Bago City", "Cadiz City", "Escalante City", "Himamaylan City", "Kabankalan City", "La Carlota City", "Sagay City", "San Carlos City", "Silay City", "Sipalay City", "Talisay City", "Victorias City", "Binalbagan", "Calatrava", "Candoni", "Cauayan", "Enrique B. Magalona", "Hinigaran", "Hinoba-an", "Ilog", "Isabela", "La Castellana", "Manapla", "Moises Padilla", "Murcia", "Pontevedra", "Pulupandan", "Salvador Benedicto", "San Enrique", "Toboso", "Valladolid"],
+            "Pangasinan": ["Alaminos City", "Dagupan City", "San Carlos City", "Urdaneta City", "Agno", "Aguilar", "Alcala", "Anda", "Asingan", "Balungao", "Bani", "Basista", "Bautista", "Bayambang", "Binalonan", "Binmaley", "Bolinao", "Bugallon", "Burgos", "Calasiao", "Dasol", "Infanta", "Labrador", "Laoac", "Lingayen", "Mabini", "Malasiqui", "Manaoag", "Mangaldan", "Mangatarem", "Mapandan", "Natividad", "Pozorrubio", "Rosales", "San Fabian", "San Jacinto", "San Manuel", "San Nicolas", "San Quintin", "Santa Barbara", "Santa Maria", "Santo Tomas", "Sison", "Sual", "Tayug", "Umingan", "Urbiztondo", "Villasis"],
+            "Camarines Sur": ["Naga City", "Iriga City", "Baao", "Balatan", "Bato", "Bombon", "Buhi", "Bula", "Cabusao", "Calabanga", "Camaligan", "Canaman", "Caramoan", "Del Gallego", "Gainza", "Garchitorena", "Goa", "Lagonoy", "Libmanan", "Lupi", "Magarao", "Milaor", "Minalabac", "Nabua", "Ocampo", "Pamplona", "Pasacao", "Pili", "Presentacion", "Ragay", "Sagñay", "San Fernando", "San Jose", "Sipocot", "Siruma", "Tigaon", "Tinambac"],
+            "Albay": ["Legazpi City", "Ligao City", "Tabaco City", "Bacacay", "Camalig", "Daraga", "Guinobatan", "Jovellar", "Libon", "Malilipot", "Malinao", "Manito", "Oas", "Pio Duran", "Polangui", "Rapu-Rapu", "Santo Domingo", "Tiwi"],
+            "Zamboanga del Sur": ["Pagadian City", "Zamboanga City", "Aurora", "Bayog", "Dimataling", "Dinas", "Dumalinao", "Dumingag", "Guipos", "Josefina", "Kumalarang", "Labangan", "Lakewood", "Lapuyan", "Mahayag", "Margosatubig", "Midsalip", "Molave", "Pitogo", "Ramon Magsaysay", "San Miguel", "San Pablo", "Sominot", "Tabina", "Tambulig", "Tigbao", "Tukuran", "Vincenzo A. Sagun"],
+            "Leyte": ["Ormoc City", "Tacloban City", "Abuyog", "Alangalang", "Albuera", "Babatngon", "Barugo", "Bato", "Baybay", "Burauen", "Calubian", "Capoocan", "Carigara", "Dagami", "Dulag", "Hilongos", "Hindang", "Inopacan", "Isabel", "Jaro", "Javier", "Julita", "Kananga", "La Paz", "Leyte", "MacArthur", "Mahaplag", "Matag-ob", "Matalom", "Mayorga", "Merida", "Palo", "Palompon", "Pastrana", "San Isidro", "San Miguel", "Santa Fe", "Tabango", "Tabontabon", "Tanauan", "Tolosa", "Tunga", "Villaba"]
+        };
+
+        // Handle province selection
+        const provinceSelect = document.getElementById('province');
+        const citySelect = document.getElementById('city');
+
+        provinceSelect.addEventListener('change', function() {
+            const selectedProvince = this.value;
+            citySelect.innerHTML = '<option value="">Select City/Municipality</option>';
+            
+            if (selectedProvince && phProvincesCities[selectedProvince]) {
+                citySelect.disabled = false;
+                phProvincesCities[selectedProvince].forEach(function(city) {
+                    const option = document.createElement('option');
+                    option.value = city;
+                    option.textContent = city;
+                    citySelect.appendChild(option);
+                });
+            } else {
+                citySelect.disabled = true;
+                citySelect.innerHTML = '<option value="">Select Province First</option>';
+            }
+        });
+    </script>
 </body>
 </html>

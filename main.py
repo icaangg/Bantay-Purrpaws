@@ -824,17 +824,24 @@ def process_register_pet(
     color: str = Form(...),
     species: Optional[str] = Form(None),  # Accept but not stored yet
     vaccination_status: bool = Form(False, alias="vaccination_status"),
-    owner_name: str = Form(...),
-    owner_contact: str = Form(...),
-    location_registered: str = Form(...),
     photo_file: UploadFile = File(None),
 ):
     """Handles owned pet registration form submission and adds it to the pending queue."""
     # 1. Handle file upload (if any)
     photo_filename = save_upload_file(photo_file)
-    # Attempt to associate the owner to the current session user if available
+    # Get current user and auto-populate owner information
     _, current_user = resolve_user(request)
-    owner_user_id = current_user.user_id if current_user else None
+    
+    if not current_user:
+        return RedirectResponse(url="/login?error=Please login to register a pet.", status_code=HTTP_303_SEE_OTHER)
+    
+    owner_user_id = current_user.user_id
+    # Auto-populate owner name and contact from logged-in user
+    owner_name = current_user.full_name or f"{current_user.first_name} {current_user.last_name}".strip()
+    # Use mobile number only, not email
+    owner_contact = current_user.mobile_number or "N/A"
+    # Use user's address as location, or default to "Not specified"
+    location_data = current_user.address if current_user.address else "Not specified"
     
     # 2. Create the new PetInDB object
     new_pet = PetInDB(
@@ -842,21 +849,21 @@ def process_register_pet(
         name=name,
         breed=breed,
         color=color,
-        location_data=location_registered,
+        location_data=location_data,
         vaccination_status=vaccination_status,
         is_stray=False,
         photo_url=photo_filename,
         owner_name=owner_name,
         owner_contact=owner_contact,
         owner_user_id=owner_user_id,
-        status="pending",
+        status="approved",  # Auto-approve registered pets
         notes=[],
     )
 
-    # 3. Add pet to pending review queue
-    pending_pets.append(new_pet)
+    # 3. Add pet directly to approved pets (auto-approved)
+    approved_pets.append(new_pet)
     save_state()
-    logs.append(f"Registered pet '{name}' (owner: {owner_name}) pending review.")
+    logs.append(f"Registered pet '{name}' (owner: {owner_name}) - automatically approved and added to View Pets.")
     save_state()
 
     # 4. Redirect the user back to the register page with a success status
@@ -879,9 +886,6 @@ def process_report_animal(
     breed: str = Form(...),
     color: str = Form(...),
     species: Optional[str] = Form(None),  # Accept but not stored yet
-    report_type: str = Form("lost"),
-    location_sighted: str = Form(...),
-    reporter_contact: str = Form(...),
     date_last_seen: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
     photo_file: UploadFile = File(None)
@@ -893,9 +897,18 @@ def process_report_animal(
     try:
         # 1. Handle file upload (if any)
         photo_filename = save_upload_file(photo_file)
-        # Attempt to associate reporter to the current session user if available
+        # Get current user and auto-populate contact info
         _, current_user = resolve_user(request)
         reporter_user_id = current_user.user_id if current_user else None
+        
+        # Auto-populate reporter contact from logged-in user
+        if current_user:
+            # Use mobile number only, not email
+            reporter_contact = current_user.mobile_number or "N/A"
+            # Use user's address as location, or default to "Not specified"
+            location_data = current_user.address if current_user.address else "Not specified"
+        else:
+            return RedirectResponse(url="/login?error=Please login to report an animal.", status_code=HTTP_303_SEE_OTHER)
 
         # 2. Create the new PetInDB object
         new_report = PetInDB(
@@ -903,11 +916,10 @@ def process_report_animal(
             name=name,
             breed=breed,
             color=color,
-            location_data=location_sighted,
+            location_data=location_data,
             vaccination_status=False, # Default to false for strays
             is_stray=True,
-            # mark as found if user reported a found animal
-            is_found=True if report_type == "found" else False,
+            is_found=False,  # Reports are for shelter, not lost/found
             photo_url=photo_filename,
             reporter_contact=reporter_contact,
             reporter_user_id=reporter_user_id,
@@ -920,7 +932,7 @@ def process_report_animal(
         # 3. Add report to pending reports queue
         pending_reports.append(new_report)
         save_state()
-        logs.append(f"Reported animal '{name}' at {location_sighted} pending review.")
+        logs.append(f"Reported animal '{name}' pending review.")
         save_state()
 
         # 4. Redirect the user back to the report page with a success status
@@ -954,7 +966,7 @@ def read_view_pets_page(request: Request):
         "pets": filtered,  # template expects 'pets'
         "user_role": user_role,
         "current_user": current_user,
-        "search_performed": True,  # Always show as if search was performed to display pets
+        "search_performed": search_performed,  # Show actual search status
         "filters": {
             "breed": request.query_params.get("breed", ""),
             "color": request.query_params.get("color", ""),
@@ -1161,6 +1173,8 @@ def process_user_registration(
     profile_photo: UploadFile = File(None),
     email: str = Form(...),
     mobile_number: str = Form(...),
+    province: Optional[str] = Form(None),
+    city: Optional[str] = Form(None),
     address: Optional[str] = Form(None),
     password: str = Form(...),
     confirm_password: str = Form(...),
@@ -1201,6 +1215,16 @@ def process_user_registration(
     name_parts.append(last_name)
     full_name = " ".join(name_parts).strip()
 
+    # Combine province, city, and street address into address field
+    address_parts = []
+    if address:
+        address_parts.append(address)
+    if city:
+        address_parts.append(city)
+    if province:
+        address_parts.append(province)
+    full_address = ", ".join(address_parts) if address_parts else None
+
     # Register the new user as a standard 'user' (General User role)
     new_user = UserAccount(
         user_id=uuid4(),
@@ -1212,7 +1236,7 @@ def process_user_registration(
         password=pwd_context.hash(password),  # Store hashed password
         role="user",  # All new registrations are 'user' by default (General User)
         birthday=date_of_birth,
-        address=address,
+        address=full_address,
         contact_info=mobile_number,  # Store mobile in contact_info for backward compatibility
         mobile_number=mobile_number,
         gender=gender,
