@@ -25,10 +25,20 @@
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                             <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/lost">Lost</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/found">Found</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
                             <li class="nav-item"><a class="nav-link" href="/report-animal">Report Animal</a></li>
+                            {% if user_role != 'guest' %}
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="/notifications">
+                                    Notifications
+                                    {% if notification_context and notification_context.has_unread %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                        {{ notification_context.unread_count }}
+                                    </span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            {% endif %}
                         </ul>
                         <div class="profile-dropdown-container">
                             <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
@@ -37,7 +47,6 @@
                             <div class="profile-dropdown-content">
                                 <a href="/profile" class="dropdown-item">Edit Profile</a>
                                 <a href="/user/dashboard" class="dropdown-item">Dashboard</a>
-                                <a href="/notifications" class="dropdown-item">Notifications</a>
                                 <a href="/logout" class="dropdown-item">Log Out</a>
                             </div>
                         </div>
@@ -54,60 +63,46 @@
                     <p class="text-muted">Stay updated with your pet reports and account activity</p>
                 </div>
 
-                <div class="row g-4">
-                    <div class="col-lg-4">
+                <div class="row">
+                    <div class="col-lg-8 mx-auto">
                         <div class="feature-box p-4">
-                            <h3 class="text-primary mb-3">My Notifications</h3>
+                            <h3 class="text-primary mb-3">All Notifications</h3>
                             {% if notifications %}
                                 <div class="list-group">
-                                    {% for n in notifications %}
-                                        <div class="list-group-item {% if not n.read %}border-primary{% endif %} mb-2">
-                                            {% if not n.read %}<span class="badge bg-primary me-2">New</span>{% endif %}
-                                            <p class="mb-1">{{ n.message }}</p>
-                                            <small class="text-muted">{{ n.timestamp }}</small>
-                                            <form method="POST" action="/notifications/dismiss" class="mt-2">
-                                                <input type="hidden" name="notification_id" value="{{ n.notification_id }}">
-                                                <button class="btn btn-sm btn-outline-secondary" type="submit">Dismiss</button>
-                                            </form>
-                                        </div>
+                                    {% for item in notifications %}
+                                        {% if item.type == "announcement" %}
+                                            <a href="/announcements" class="list-group-item list-group-item-action {% if item.read %}bg-light text-muted{% else %}bg-white{% endif %} mb-2">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <strong class="d-block">📢 {{ item.title }}</strong>
+                                                        <small class="text-muted">Announcement</small>
+                                                    </div>
+                                                    {% if item.timestamp %}
+                                                    <small class="text-muted">{{ item.timestamp[:10] }}</small>
+                                                    {% endif %}
+                                                </div>
+                                            </a>
+                                        {% else %}
+                                            <div class="list-group-item {% if not item.read %}bg-dark text-white{% else %}bg-light text-muted{% endif %} mb-2" data-notification-id="{{ item.notification.notification_id }}" data-read="{{ item.read }}">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div class="flex-grow-1">
+                                                        {% if not item.read %}<span class="badge bg-danger me-2">New</span>{% endif %}
+                                                        <p class="mb-1 {% if item.read %}text-muted{% endif %}">{{ item.notification.message }}</p>
+                                                        {% if item.timestamp %}
+                                                        <small class="{% if item.read %}text-muted{% else %}text-white-50{% endif %}">{{ item.timestamp }}</small>
+                                                        {% endif %}
+                                                    </div>
+                                                    <form method="POST" action="/notifications/dismiss" class="ms-2">
+                                                        <input type="hidden" name="notification_id" value="{{ item.notification.notification_id }}">
+                                                        <button class="btn btn-sm {% if item.read %}btn-outline-secondary{% else %}btn-outline-light{% endif %}" type="submit">Dismiss</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             {% else %}
                                 <p class="text-muted">No notifications at the moment.</p>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <div class="feature-box p-4">
-                            <h3 class="text-primary mb-3">Announcements</h3>
-                            {% if announcements %}
-                                <div class="list-group">
-                                    {% for a in announcements %}
-                                        <div class="list-group-item mb-2">
-                                            <p class="mb-0">{{ a }}</p>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p class="text-muted">No announcements.</p>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <div class="feature-box p-4">
-                            <h3 class="text-primary mb-3">Admin Responses</h3>
-                            {% if responses %}
-                                <div class="list-group">
-                                    {% for r in responses %}
-                                        <div class="list-group-item mb-2">
-                                            <p class="mb-0">{{ r }}</p>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <p class="text-muted">No new responses.</p>
                             {% endif %}
                         </div>
                     </div>
@@ -161,5 +156,40 @@
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Mark unread notifications as read when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const unreadNotifications = document.querySelectorAll('[data-notification-id][data-read="False"]');
+            unreadNotifications.forEach(function(notification) {
+                const notificationId = notification.getAttribute('data-notification-id');
+                // Mark as read via AJAX
+                fetch('/notifications/mark-read', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'notification_id=' + encodeURIComponent(notificationId)
+                }).then(function() {
+                    // Update UI to show as read (lighter)
+                    notification.classList.remove('bg-dark', 'text-white');
+                    notification.classList.add('bg-light', 'text-muted');
+                    const badge = notification.querySelector('.badge');
+                    if (badge) badge.remove();
+                    const textElements = notification.querySelectorAll('p, small');
+                    textElements.forEach(function(el) {
+                        el.classList.remove('text-white-50');
+                        el.classList.add('text-muted');
+                    });
+                    const dismissBtn = notification.querySelector('button');
+                    if (dismissBtn) {
+                        dismissBtn.classList.remove('btn-outline-light');
+                        dismissBtn.classList.add('btn-outline-secondary');
+                    }
+                }).catch(function(err) {
+                    console.error('Error marking notification as read:', err);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

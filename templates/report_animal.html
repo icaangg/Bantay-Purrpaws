@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report Animal | Bantay PurrPaws</title>
+    <title>Report Animal for Shelter | Bantay PurrPaws</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/bootstrap-override.css">
     <link rel="stylesheet" href="/static/style.css">
@@ -25,10 +25,20 @@
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                             <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/lost">Lost</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/found">Found</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
                             <li class="nav-item"><a class="nav-link active" href="/report-animal">Report Animal</a></li>
+                            {% if user_role != 'guest' %}
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="/notifications">
+                                    Notifications
+                                    {% if notification_context and notification_context.has_unread %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                        {{ notification_context.unread_count }}
+                                    </span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            {% endif %}
                             {% if user_role == 'admin' %}
                                 <li class="nav-item"><a class="nav-link text-primary fw-bold" href="/admin/dashboard">Admin</a></li>
                             {% endif %}
@@ -60,8 +70,8 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
                         <div class="text-center mb-4">
-                            <h1 class="text-primary mb-2">Report a Stray or Lost Animal</h1>
-                            <p class="text-muted">Provide details about the animal you found or sighted to help match them with their owner.</p>
+                            <h1 class="text-primary mb-2">Report Animal for Shelter</h1>
+                            <p class="text-muted">Report animals that need shelter assistance or care.</p>
                         </div>
 
                         <div class="feature-box p-4 p-md-5">
@@ -122,7 +132,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <label for="location_sighted" class="form-label">Location Sighted/Found <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="location_sighted" name="location_sighted" required placeholder="e.g., Intersection of JP Rizal St & Mabini Ave">
+                                        <input type="text" class="form-control" id="location_sighted" name="location_sighted" required placeholder="e.g., Intersection of JP Rizal St & Mabini Ave" autocomplete="off">
                                     </div>
                                 </div>
 
@@ -202,5 +212,34 @@
         });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFw0Qbyq9zTFTd-tUY6d-s6U4iYb5J3ZQ&libraries=places"></script>
+    <script>
+        // Initialize Google Places Autocomplete for location field
+        function initAutocomplete() {
+            const locationInput = document.getElementById('location_sighted');
+            if (locationInput) {
+                const autocomplete = new google.maps.places.Autocomplete(locationInput, {
+                    types: ['geocode', 'establishment'],
+                    componentRestrictions: { country: ['ph'] } // Restrict to Philippines
+                });
+                autocomplete.addListener('place_changed', function() {
+                    const place = autocomplete.getPlace();
+                    if (place.formatted_address) {
+                        locationInput.value = place.formatted_address;
+                    }
+                });
+            }
+        }
+        // Initialize when page loads
+        if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+            initAutocomplete();
+        } else {
+            window.addEventListener('load', function() {
+                if (typeof google !== 'undefined' && google.maps && google.maps.places) {
+                    initAutocomplete();
+                }
+            });
+        }
+    </script>
 </body>
 </html>

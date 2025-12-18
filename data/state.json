@@ -253,331 +253,57 @@
     "User user@purrpaws.com dismissed notification 0f9d250c-587d-41c3-b5d0-beecada9b368.",
     "User user@purrpaws.com dismissed notification 9ad7869c-9737-46d5-b25f-a082915c6164.",
     "User user@purrpaws.com dismissed notification db2929ef-0f54-41a5-a6f8-a2477f281acf.",
-    "Admin Admin User deleted user Jessica Sales (jessica.sales.evsu@gmail.com)"
+    "Admin Admin User deleted user Jessica Sales (jessica.sales.evsu@gmail.com)",
+    "User user@purrpaws.com dismissed notification 0f9d250c-587d-41c3-b5d0-beecada9b368.",
+    "User user@purrpaws.com dismissed notification 9ad7869c-9737-46d5-b25f-a082915c6164.",
+    "User user@purrpaws.com dismissed notification 37cea01a-3106-470b-9089-a91f2c741ec5.",
+    "User user@purrpaws.com dismissed notification 172375d5-20b7-4d13-a730-21557962896b.",
+    "User user@purrpaws.com dismissed notification 7f828683-e077-42b9-8122-507cc0a59821.",
+    "User user@purrpaws.com dismissed notification 44456742-11e5-4b30-9bd1-7d70661516fc.",
+    "User user@purrpaws.com dismissed notification 22a87805-0ddf-4bd1-a0ec-5327a5561ef3.",
+    "User user@purrpaws.com dismissed notification 81249d28-6f21-476f-b4b6-0eb3ac16fe0b.",
+    "User user@purrpaws.com dismissed notification 5be97fe8-2465-4abb-b7ee-4910667917ee.",
+    "User user@purrpaws.com dismissed notification 0b6de7fb-8cad-4a1a-a637-bf6715618cca.",
+    "User user@purrpaws.com dismissed notification c0494889-ca5b-4a21-a4d9-0c4755c52d96.",
+    "User user@purrpaws.com dismissed notification 97cd56eb-83ec-4cca-b4f6-9a48e98c733c.",
+    "User user@purrpaws.com dismissed notification cb329cbe-dd3b-4f5f-bcae-7eb2419d8250.",
+    "User user@purrpaws.com dismissed notification 8fed0c45-5bc0-48c7-9807-0aaff1c06ff2.",
+    "User user@purrpaws.com dismissed notification 44c50021-7f72-4fc0-b7be-a0475a4557e1.",
+    "User user@purrpaws.com dismissed notification a7afe174-b7b6-4ca7-906d-5272d782d8e9.",
+    "User user@purrpaws.com dismissed notification cf2b4628-cd2f-4705-908c-666a197a57f2.",
+    "User user@purrpaws.com dismissed notification da08d9ab-a6eb-4333-b81f-ee9686b7e03f.",
+    "User user@purrpaws.com dismissed notification 6200836b-d035-4e3e-a119-b7308e61c0d5.",
+    "User user@purrpaws.com dismissed notification ef2d8bf0-6cef-49b4-bb74-9b6069ee5b71.",
+    "User user@purrpaws.com dismissed notification 7bc3d578-faa2-4558-9719-e7bcaf8b1ed9.",
+    "User user@purrpaws.com dismissed notification 59fd813d-c2d6-421f-971c-689c4e994634.",
+    "User user@purrpaws.com dismissed notification e3b379cb-7bea-43de-ae39-332f084b66cc.",
+    "User user@purrpaws.com dismissed notification cf2cfd14-07f1-4d21-9f44-69fdf366b432.",
+    "User user@purrpaws.com dismissed notification f06059c7-5a84-434b-9ccb-d89b6a92c227.",
+    "User user@purrpaws.com dismissed notification c71a051a-7ad8-4cdd-be04-018b715d7494.",
+    "User user@purrpaws.com dismissed notification 33dcd292-4253-42cd-b3f3-889f271384a2.",
+    "User user@purrpaws.com dismissed notification 76a2a990-4b0b-4107-8ff6-d7980a855510.",
+    "User user@purrpaws.com dismissed notification 63ae3ef4-f0e5-4d95-9de5-2c95ff4f43dc.",
+    "User user@purrpaws.com dismissed notification db2929ef-0f54-41a5-a6f8-a2477f281acf.",
+    "User user@purrpaws.com dismissed notification 113ae0e3-8eca-4cc4-ba2c-5cd65215c9e2.",
+    "User user@purrpaws.com dismissed notification 29362f6b-fc77-4c49-b3d8-df305b39b9f7.",
+    "User user@purrpaws.com dismissed notification 287d1729-a602-4c13-a050-29d0c0b199a6.",
+    "User user@purrpaws.com dismissed notification d2770946-5804-489a-b119-ded4689ee95d.",
+    "User user@purrpaws.com dismissed notification cb9d110a-cc75-4768-ad41-d9a3b4cff064.",
+    "User user@purrpaws.com dismissed notification 06807eb1-557e-417b-b317-eef3ef90948c.",
+    "User user@purrpaws.com dismissed notification b51d61ef-7607-4788-97fe-c41675ca9a03.",
+    "User user@purrpaws.com dismissed notification 61868bda-c109-4322-b254-4f83e1653320.",
+    "User user@purrpaws.com dismissed notification 0677c2aa-c54d-475c-a385-357f2598185b.",
+    "User user@purrpaws.com dismissed notification f28a3a98-ef23-437c-a8cf-a315a46f299a.",
+    "User user@purrpaws.com dismissed notification 96c79426-790d-4cb7-9fa2-58d920c57231.",
+    "User user@purrpaws.com dismissed notification 518ea785-13aa-480a-a57a-df83b111ce78.",
+    "User user@purrpaws.com dismissed notification 6d007f25-25a9-45b2-92d5-8d4ab363a0d7.",
+    "User user@purrpaws.com dismissed notification f21ded85-37b2-437c-b5a3-8fbfa8974121.",
+    "User user@purrpaws.com dismissed notification 9e149e5b-4f39-453e-99f7-5cea7218bdff.",
+    "User user@purrpaws.com dismissed notification 3c4e4789-28d1-4bb0-9e65-1b0829f887ef.",
+    "User user@purrpaws.com dismissed notification deaccc2c-1967-4fca-b7da-13701b0446a5.",
+    "User user@purrpaws.com dismissed notification 9d4f4d12-1f13-4a9f-bed3-72e8cefe5c41."
   ],
   "notifications": [
-    {
-      "notification_id": "37cea01a-3106-470b-9089-a91f2c741ec5",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "manual test",
-      "read": true,
-      "timestamp": "2025-12-14T08:12:08.445013"
-    },
-    {
-      "notification_id": "172375d5-20b7-4d13-a730-21557962896b",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPetForNotif2' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T08:13:27.487354"
-    },
-    {
-      "notification_id": "7f828683-e077-42b9-8122-507cc0a59821",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T08:13:52.793419"
-    },
-    {
-      "notification_id": "22a87805-0ddf-4bd1-a0ec-5327a5561ef3",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T08:16:12.625862"
-    },
-    {
-      "notification_id": "81249d28-6f21-476f-b4b6-0eb3ac16fe0b",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T08:16:36.964304"
-    },
-    {
-      "notification_id": "5be97fe8-2465-4abb-b7ee-4910667917ee",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T08:17:54.828944"
-    },
-    {
-      "notification_id": "0b6de7fb-8cad-4a1a-a637-bf6715618cca",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T08:18:34.542313"
-    },
-    {
-      "notification_id": "c0494889-ca5b-4a21-a4d9-0c4755c52d96",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T09:07:31.387212"
-    },
-    {
-      "notification_id": "97cd56eb-83ec-4cca-b4f6-9a48e98c733c",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T13:56:55.852611"
-    },
-    {
-      "notification_id": "cb329cbe-dd3b-4f5f-bcae-7eb2419d8250",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T13:59:56.791031+00:00"
-    },
-    {
-      "notification_id": "3c4e4789-28d1-4bb0-9e65-1b0829f887ef",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:00:06.029057+00:00"
-    },
-    {
-      "notification_id": "deaccc2c-1967-4fca-b7da-13701b0446a5",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:08:05.008217+00:00"
-    },
-    {
-      "notification_id": "9e149e5b-4f39-453e-99f7-5cea7218bdff",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:10:10.589658+00:00"
-    },
-    {
-      "notification_id": "f21ded85-37b2-437c-b5a3-8fbfa8974121",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:12:27.109792+00:00"
-    },
-    {
-      "notification_id": "6d007f25-25a9-45b2-92d5-8d4ab363a0d7",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:13:17.611388+00:00"
-    },
-    {
-      "notification_id": "518ea785-13aa-480a-a57a-df83b111ce78",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:13:49.711964+00:00"
-    },
-    {
-      "notification_id": "7bc3d578-faa2-4558-9719-e7bcaf8b1ed9",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:17:01.168930+00:00"
-    },
-    {
-      "notification_id": "96c79426-790d-4cb7-9fa2-58d920c57231",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:17:38.636231+00:00"
-    },
-    {
-      "notification_id": "f28a3a98-ef23-437c-a8cf-a315a46f299a",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:17:56.197297+00:00"
-    },
-    {
-      "notification_id": "44456742-11e5-4b30-9bd1-7d70661516fc",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:24:36.322087+00:00"
-    },
-    {
-      "notification_id": "0677c2aa-c54d-475c-a385-357f2598185b",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:26:25.061765+00:00"
-    },
-    {
-      "notification_id": "61868bda-c109-4322-b254-4f83e1653320",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:30:29.133946+00:00"
-    },
-    {
-      "notification_id": "b51d61ef-7607-4788-97fe-c41675ca9a03",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:33:30.630151+00:00"
-    },
-    {
-      "notification_id": "8fed0c45-5bc0-48c7-9807-0aaff1c06ff2",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:34:09.623185+00:00"
-    },
-    {
-      "notification_id": "06807eb1-557e-417b-b317-eef3ef90948c",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:35:02.602157+00:00"
-    },
-    {
-      "notification_id": "cb9d110a-cc75-4768-ad41-d9a3b4cff064",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:35:27.209811+00:00"
-    },
-    {
-      "notification_id": "6200836b-d035-4e3e-a119-b7308e61c0d5",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:42:36.938307+00:00"
-    },
-    {
-      "notification_id": "59fd813d-c2d6-421f-971c-689c4e994634",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T14:43:06.352860+00:00"
-    },
-    {
-      "notification_id": "ef2d8bf0-6cef-49b4-bb74-9b6069ee5b71",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:43:00.662992+00:00"
-    },
-    {
-      "notification_id": "d2770946-5804-489a-b119-ded4689ee95d",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:44:27.320745+00:00"
-    },
-    {
-      "notification_id": "e3b379cb-7bea-43de-ae39-332f084b66cc",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:44:58.515149+00:00"
-    },
-    {
-      "notification_id": "287d1729-a602-4c13-a050-29d0c0b199a6",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:45:55.271751+00:00"
-    },
-    {
-      "notification_id": "76a2a990-4b0b-4107-8ff6-d7980a855510",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:46:24.471921+00:00"
-    },
-    {
-      "notification_id": "f06059c7-5a84-434b-9ccb-d89b6a92c227",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:46:49.925579+00:00"
-    },
-    {
-      "notification_id": "cf2b4628-cd2f-4705-908c-666a197a57f2",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:47:14.727512+00:00"
-    },
-    {
-      "notification_id": "da08d9ab-a6eb-4333-b81f-ee9686b7e03f",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:47:49.471713+00:00"
-    },
-    {
-      "notification_id": "33dcd292-4253-42cd-b3f3-889f271384a2",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:48:37.274194+00:00"
-    },
-    {
-      "notification_id": "44c50021-7f72-4fc0-b7be-a0475a4557e1",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:49:03.177995+00:00"
-    },
-    {
-      "notification_id": "a7afe174-b7b6-4ca7-906d-5272d782d8e9",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:49:27.965372+00:00"
-    },
-    {
-      "notification_id": "c71a051a-7ad8-4cdd-be04-018b715d7494",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:50:30.504876+00:00"
-    },
-    {
-      "notification_id": "29362f6b-fc77-4c49-b3d8-df305b39b9f7",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T20:58:48.584767+00:00"
-    },
-    {
-      "notification_id": "cf2cfd14-07f1-4d21-9f44-69fdf366b432",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T21:05:43.399590+00:00"
-    },
-    {
-      "notification_id": "113ae0e3-8eca-4cc4-ba2c-5cd65215c9e2",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T21:06:44.132729+00:00"
-    },
-    {
-      "notification_id": "63ae3ef4-f0e5-4d95-9de5-2c95ff4f43dc",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'TestPet123' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-14T21:07:18.151188+00:00"
-    },
-    {
-      "notification_id": "db2929ef-0f54-41a5-a6f8-a2477f281acf",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'Jessica Sales' has been approved by admin.",
-      "read": true,
-      "timestamp": "2025-12-15T00:07:27.158563+00:00"
-    },
-    {
-      "notification_id": "9d4f4d12-1f13-4a9f-bed3-72e8cefe5c41",
-      "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
-      "message": "Your case/pet 'Luna' has been approved by admin.",
-      "read": false,
-      "timestamp": "2025-12-15T07:20:08.701487+00:00"
-    },
     {
       "notification_id": "0f9d250c-587d-41c3-b5d0-beecada9b368",
       "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
@@ -589,7 +315,7 @@
       "notification_id": "b0ef10dd-1de3-4d2a-b274-ae58a2f87d93",
       "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
       "message": "Jessica Sales (xjammie143@gmail.com) is interested in adopting Luna. Please contact them at xjammie143@gmail.com.",
-      "read": false,
+      "read": true,
       "timestamp": "2025-12-16T17:57:00.337200+00:00"
     },
     {
@@ -603,14 +329,14 @@
       "notification_id": "5f87cd74-0c0e-4fa7-95b5-5aa6c8a45d1d",
       "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
       "message": "Your case/pet 'Max' has been approved by admin.",
-      "read": false,
+      "read": true,
       "timestamp": "2025-12-16T18:09:34.107265+00:00"
     },
     {
       "notification_id": "12d1d074-1e36-4288-bae7-d4ea19c70224",
       "user_id": "95997287-fcac-49f1-91f0-d3423bf749e5",
       "message": "Jessica Sales (xjammie143@gmail.com) is interested in adopting Max. Please contact them at xjammie143@gmail.com.",
-      "read": false,
+      "read": true,
       "timestamp": "2025-12-16T18:09:49.336927+00:00"
     }
   ],

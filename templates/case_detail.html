@@ -29,10 +29,20 @@
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                             <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/lost">Lost</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/found">Found</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
                             <li class="nav-item"><a class="nav-link" href="/report-animal">Report Animal</a></li>
+                            {% if user_role != 'guest' %}
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="/notifications">
+                                    Notifications
+                                    {% if notification_context and notification_context.has_unread %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                        {{ notification_context.unread_count }}
+                                    </span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            {% endif %}
                         </ul>
                         <div class="profile-dropdown-container">
                             <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">

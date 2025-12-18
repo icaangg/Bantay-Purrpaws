@@ -25,10 +25,20 @@
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
                             <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/lost">Lost</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/found">Found</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
                             <li class="nav-item"><a class="nav-link active" href="/report-animal">Report Animal</a></li>
+                            {% if user_role != 'guest' %}
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="/notifications">
+                                    Notifications
+                                    {% if notification_context and notification_context.has_unread %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                        {{ notification_context.unread_count }}
+                                    </span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            {% endif %}
                         </ul>
                         <div class="profile-dropdown-container">
                             <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
@@ -37,7 +47,6 @@
                             <div class="profile-dropdown-content">
                                 <a href="/profile" class="dropdown-item">Edit Profile</a>
                                 <a href="/user/dashboard" class="dropdown-item">Dashboard</a>
-                                <a href="/notifications" class="dropdown-item">Notifications</a>
                                 <a href="/settings" class="dropdown-item">Settings</a>
                                 <a href="/support" class="dropdown-item">Support</a>
                                 <a href="/logout" class="dropdown-item">Log Out</a>
@@ -177,229 +186,7 @@
                     {% endif %}
                 </section>
 
-                <!-- Lost & Found Reports -->
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                        <div class="feature-box p-4 h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h3 class="text-primary mb-0">Lost Pet Reports</h3>
-                                <a href="/report-animal" class="btn btn-sm cta-primary">+ Report</a>
-                            </div>
-                            {% if user_lost_reports %}
-                                <div class="list-group">
-                                    {% for r in user_lost_reports %}
-                                        <div class="list-group-item">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div class="flex-grow-1">
-                                                    <h6 class="text-primary mb-1">{{ r.name }}</h6>
-                                                    <p class="mb-1 small text-muted">{{ r.location_data }}</p>
-                                                    <span class="badge 
-                                                        {% if r.status == 'approved' %}bg-success
-                                                        {% elif r.status == 'pending' %}bg-warning
-                                                        {% else %}bg-secondary{% endif %}">
-                                                        {{ r.status }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2 d-flex gap-2">
-                                                <a href="/user/case/{{ r.pet_id }}" class="btn btn-sm cta-secondary">View</a>
-                                                <form method="POST" action="/user/report/delete" class="d-inline">
-                                                    <input type="hidden" name="report_id" value="{{ r.pet_id }}">
-                                                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="alert alert-info">No lost reports submitted yet.</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="feature-box p-4 h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h3 class="text-primary mb-0">Found Animal Reports</h3>
-                                <a href="/report-animal" class="btn btn-sm cta-primary">+ Report</a>
-                            </div>
-                            {% if user_found_reports %}
-                                <div class="list-group">
-                                    {% for r in user_found_reports %}
-                                        <div class="list-group-item">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div class="flex-grow-1">
-                                                    <h6 class="text-primary mb-1">{{ r.name }}</h6>
-                                                    <p class="mb-1 small text-muted">{{ r.location_data }}</p>
-                                                    <span class="badge 
-                                                        {% if r.status == 'approved' %}bg-success
-                                                        {% elif r.status == 'pending' %}bg-warning
-                                                        {% else %}bg-secondary{% endif %}">
-                                                        {{ r.status }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <div class="mt-2 d-flex gap-2">
-                                                <a href="/user/case/{{ r.pet_id }}" class="btn btn-sm cta-secondary">View</a>
-                                                <form method="POST" action="/user/report/delete" class="d-inline">
-                                                    <input type="hidden" name="report_id" value="{{ r.pet_id }}">
-                                                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="alert alert-info">No found reports submitted yet.</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
 
-                <!-- All Community Lost & Found Reports -->
-                <section class="feature-box p-4 mb-4">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-                        <h2 class="text-primary mb-0">All Community Lost &amp; Found Reports</h2>
-                        <div class="d-flex gap-2">
-                            <a href="/lost" class="btn btn-sm cta-secondary">View Lost Page</a>
-                            <a href="/found" class="btn btn-sm cta-secondary">View Found Page</a>
-                        </div>
-                    </div>
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <h4 class="mb-3 text-primary">All Lost Reports</h4>
-                            {% if community_lost_reports %}
-                                <div class="list-group">
-                                    {% for r in community_lost_reports[:5] %}
-                                        <div class="list-group-item">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div class="flex-grow-1">
-                                                    <h6 class="text-primary mb-1">{{ r.name }}</h6>
-                                                    <p class="mb-1 small text-muted">{{ r.location_data }}</p>
-                                                    <span class="badge 
-                                                        {% if r.status == 'approved' %}bg-success
-                                                        {% elif r.status == 'pending' %}bg-warning
-                                                        {% else %}bg-secondary{% endif %}">
-                                                        {{ r.status }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="alert alert-info mb-0">No lost reports in the system yet.</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <h4 class="mb-3 text-primary">All Found Reports</h4>
-                            {% if community_found_reports %}
-                                <div class="list-group">
-                                    {% for r in community_found_reports[:5] %}
-                                        <div class="list-group-item">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div class="flex-grow-1">
-                                                    <h6 class="text-primary mb-1">{{ r.name }}</h6>
-                                                    <p class="mb-1 small text-muted">{{ r.location_data }}</p>
-                                                    <span class="badge 
-                                                        {% if r.status == 'approved' %}bg-success
-                                                        {% elif r.status == 'pending' %}bg-warning
-                                                        {% else %}bg-secondary{% endif %}">
-                                                        {{ r.status }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="alert alert-info mb-0">No found reports in the system yet.</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Suggested Matches -->
-                {% if suggested_matches %}
-                    <section class="feature-box p-4 mb-4">
-                        <h2 class="text-primary mb-3">Suggested Matches</h2>
-                        {% for lost_id, matches in suggested_matches.items() %}
-                            <div class="card mb-3 border-0 shadow-sm">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0">Matches for {{ suggestions_map[lost_id].name }}</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row g-3">
-                                        {% for m in matches %}
-                                            <div class="col-md-6">
-                                                <div class="card border">
-                                                    {% if m.photo_url %}
-                                                        <img src="{{ m.photo_url }}" alt="{{ m.name }}" class="card-img-top" style="height: 150px; object-fit: cover;">
-                                                    {% endif %}
-                                                    <div class="card-body">
-                                                        <h6 class="text-primary">{{ m.name }}</h6>
-                                                        <p class="mb-1 small"><strong>Breed:</strong> {{ m.breed }}</p>
-                                                        <p class="mb-1 small"><strong>Color:</strong> {{ m.color }}</p>
-                                                        <p class="mb-2 small"><strong>Location:</strong> {{ m.location_data }}</p>
-                                                        <a href="/user/case/{{ m.pet_id }}" class="btn btn-sm cta-primary">View Case</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </section>
-                {% endif %}
-
-                <!-- Notifications & Announcements -->
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                        <div class="feature-box p-4 h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h3 class="text-primary mb-0">Notifications</h3>
-                                <a href="/notifications" class="btn btn-sm cta-secondary">View All</a>
-                            </div>
-                            {% if notifications %}
-                                <div class="list-group">
-                                    {% for n in notifications[:5] %}
-                                        <div class="list-group-item">
-                                            {% if n.message %}
-                                                <p class="mb-0 small">{{ n.message }}</p>
-                                                {% if n.timestamp %}<small class="text-muted">{{ n.timestamp }}</small>{% endif %}
-                                            {% else %}
-                                                <p class="mb-0 small">{{ n }}</p>
-                                            {% endif %}
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="alert alert-info">No new notifications.</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="feature-box p-4 h-100">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h3 class="text-primary mb-0">Announcements</h3>
-                                <a href="/announcements" class="btn btn-sm cta-secondary">View All</a>
-                            </div>
-                            {% if announcements %}
-                                <div class="list-group">
-                                    {% for a in announcements %}
-                                        <div class="list-group-item">
-                                            <h6 class="mb-1 fw-bold">{{ a.title if a.title else a }}</h6>
-                                            <p class="mb-0 small">{{ a.content if a.content else a }}</p>
-                                            <small class="text-muted">{{ a.created_at[:10] if a.created_at else '' }}</small>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                <div class="alert alert-info">No announcements.</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Search -->
                 <section class="feature-box p-4 mb-4">

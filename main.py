@@ -520,6 +520,21 @@ def resolve_user(request: Request):
     current_user = get_current_user(request)
     return user_role, current_user
 
+def get_notification_context(current_user: Optional[UserAccount]) -> dict:
+    """Get notification counts and data for navbar display."""
+    if not current_user:
+        return {"unread_count": 0, "total_count": 0, "has_unread": False}
+    
+    global notifications
+    user_notifications = [n for n in notifications if n.user_id and str(n.user_id) == str(current_user.user_id)]
+    unread_count = len([n for n in user_notifications if not n.read])
+    
+    return {
+        "unread_count": unread_count,
+        "total_count": len(user_notifications),
+        "has_unread": unread_count > 0
+    }
+
 def save_upload_file(upload_file: UploadFile) -> Optional[str]:
     """Saves the uploaded file to the UPLOAD_DIR and returns the filename."""
     if not upload_file or not getattr(upload_file, 'filename', None):
@@ -575,6 +590,7 @@ def read_root(request: Request):
         "recent_lost": recent_lost,
         "recent_found": recent_found,
         "homepage_reviews": homepage_reviews,
+        "notification_context": get_notification_context(current_user),
     }
     return templates.TemplateResponse("home.html", context)
 
@@ -585,13 +601,29 @@ def dismiss_notification(request: Request, notification_id: str = Form(...)):
     if not current_user:
            return RedirectResponse(url="/login?error=Login required.", status_code=HTTP_303_SEE_OTHER)
 
+    global notifications
     found = next((n for n in notifications if str(n.notification_id) == notification_id and n.user_id and str(n.user_id) == str(current_user.user_id)), None)
     if found:
-        # mark as read
-        found.read = True
+        # Remove notification from list
+        notifications.remove(found)
         logs.append(f"User {current_user.email} dismissed notification {found.notification_id}.")
         save_state()
 
+    return RedirectResponse(url="/notifications", status_code=HTTP_303_SEE_OTHER)
+
+@app.post("/notifications/mark-read", status_code=HTTP_303_SEE_OTHER, tags=["Core Pages"])
+def mark_notification_read(request: Request, notification_id: str = Form(...)):
+    """Mark a notification as read when viewed."""
+    user_role, current_user = resolve_user(request)
+    if not current_user:
+        return RedirectResponse(url="/login?error=Login required.", status_code=HTTP_303_SEE_OTHER)
+    
+    global notifications
+    found = next((n for n in notifications if str(n.notification_id) == notification_id and n.user_id and str(n.user_id) == str(current_user.user_id)), None)
+    if found and not found.read:
+        found.read = True
+        save_state()
+    
     return RedirectResponse(url="/notifications", status_code=HTTP_303_SEE_OTHER)
 
 
@@ -612,34 +644,57 @@ def read_notifications(request: Request):
     global notifications
     user_notifications = [n for n in notifications if n.user_id and str(n.user_id) == str(current_user.user_id)]
     
-    # Sort notifications: unread first, then by timestamp (newest first)
-    def sort_key(n: Notification):
-        # Unread notifications come first (False sorts before True)
-        read_priority = 0 if not n.read else 1
-        # Parse timestamp for sorting (newest first)
+    # Get published announcements and add them as notification-like items
+    published_announcements = [a for a in announcements_list if a.published]
+    # Create notification-like objects for announcements (they're always "read" since they're public)
+    announcement_notifications = []
+    for a in published_announcements:
+        # Create a simple dict-like object for announcements
+        announcement_notifications.append({
+            "type": "announcement",
+            "title": a.title,
+            "announcement_id": str(a.announcement_id),
+            "read": True,  # Announcements are always considered "read" for styling
+            "timestamp": a.created_at if hasattr(a, 'created_at') else ""
+        })
+    
+    # Combine regular notifications with announcement notifications
+    all_notifications = []
+    for n in user_notifications:
+        all_notifications.append({
+            "type": "notification",
+            "notification": n,
+            "read": n.read,
+            "timestamp": n.timestamp
+        })
+    
+    # Add announcements
+    all_notifications.extend(announcement_notifications)
+    
+    # Sort: unread first, then by timestamp (newest first)
+    def sort_key(item):
+        read_priority = 0 if not item.get("read", True) else 1
         try:
-            if n.timestamp:
-                ts = datetime.fromisoformat(n.timestamp.replace('Z', '+00:00'))
+            ts_str = item.get("timestamp", "")
+            if ts_str:
+                ts = datetime.fromisoformat(ts_str.replace('Z', '+00:00'))
                 timestamp_value = ts.timestamp()
             else:
                 timestamp_value = 0
         except:
             timestamp_value = 0
-        return (read_priority, -timestamp_value)  # Negative for descending order
+        return (read_priority, -timestamp_value)
     
-    user_notifications.sort(key=sort_key)
+    all_notifications.sort(key=sort_key)
 
-    # Get published announcements
-    announcements = [a.content for a in announcements_list if a.published]
-    responses = []
+    notification_context = get_notification_context(current_user)
 
     context = {
         "request": request,
         "user_role": user_role,
         "current_user": current_user,
-        "notifications": user_notifications,
-        "announcements": announcements,
-        "responses": responses
+        "notifications": all_notifications,
+        "notification_context": notification_context
     }
     return templates.TemplateResponse("notifications.html", context) 
 
@@ -650,7 +705,7 @@ def read_announcements(request: Request):
     # Show only published announcements
     published_announcements = [a for a in announcements_list if a.published]
     items = [a.title + ": " + a.content for a in published_announcements]
-    context = {"request": request, "user_role": user_role, "current_user": current_user, "items": items}
+    context = {"request": request, "user_role": user_role, "current_user": current_user, "items": items, "notification_context": get_notification_context(current_user)}
     return templates.TemplateResponse(request, "announcements.html", context) 
 
 
@@ -664,7 +719,7 @@ def read_support(request: Request):
         ("How to register my pet?", "Use Register Pet and include vaccination status if known."),
         ("How to update my profile?", "Use the Edit Profile link in the navbar dropdown.")
     ]
-    context = {"request": request, "user_role": user_role, "current_user": current_user, "status": status, "faq": faq}
+    context = {"request": request, "user_role": user_role, "current_user": current_user, "status": status, "faq": faq, "notification_context": get_notification_context(current_user)}
     return templates.TemplateResponse("support.html", context) 
 
 
@@ -682,7 +737,7 @@ def read_settings(request: Request):
     if not current_user:
         return RedirectResponse(url="/login?error=Login required.", status_code=HTTP_303_SEE_OTHER)
 
-    context = {"request": request, "user_role": user_role, "current_user": current_user}
+    context = {"request": request, "user_role": user_role, "current_user": current_user, "notification_context": get_notification_context(current_user)}
     return templates.TemplateResponse(request, "settings.html", context) 
 
 
@@ -715,7 +770,7 @@ def read_profile_page(request: Request):
     if not current_user:
         return RedirectResponse(url="/login?error=Login required.", status_code=HTTP_303_SEE_OTHER)
 
-    context = {"request": request, "user_role": user_role, "current_user": current_user}
+    context = {"request": request, "user_role": user_role, "current_user": current_user, "notification_context": get_notification_context(current_user)}
     return templates.TemplateResponse("profile.html", context) 
 
 
@@ -755,7 +810,8 @@ def read_register_pet_page(request: Request):
         "request": request,
         "user_role": user_role,
         "current_user": current_user,
-        "status": status # UPDATED: Pass status to template
+        "status": status, # UPDATED: Pass status to template
+        "notification_context": get_notification_context(current_user)
     }
     return templates.TemplateResponse(name="pet_register.html", context=context)
 
@@ -813,7 +869,7 @@ def read_report_animal_page(request: Request):
     """Renders the animal reporting page."""
     user_role, current_user = resolve_user(request)
     status = request.query_params.get('status') # Added to read status
-    context = {"request": request, "user_role": user_role, "current_user": current_user, "status": status}
+    context = {"request": request, "user_role": user_role, "current_user": current_user, "status": status, "notification_context": get_notification_context(current_user)}
     return templates.TemplateResponse(name="report_animal.html", context=context)
 
 @app.post("/report-animal", status_code=HTTP_303_SEE_OTHER, tags=["Pet Management"])
@@ -891,18 +947,20 @@ def read_view_pets_page(request: Request):
 
     # Only show owned pets (registered pets), not stray reports
     owned_pets = [p for p in approved_pets if not p.is_stray]
-    filtered = [p for p in owned_pets if matches(p)] if search_performed else []
+    # Auto-display all pets if no search, otherwise filter
+    filtered = [p for p in owned_pets if matches(p)] if search_performed else owned_pets
     context = {
         "request": request,
         "pets": filtered,  # template expects 'pets'
         "user_role": user_role,
         "current_user": current_user,
-        "search_performed": search_performed,
+        "search_performed": True,  # Always show as if search was performed to display pets
         "filters": {
             "breed": request.query_params.get("breed", ""),
             "color": request.query_params.get("color", ""),
             "location": request.query_params.get("location", "")
-        }
+        },
+        "notification_context": get_notification_context(current_user),
     }
     return templates.TemplateResponse( "view_pets.html", context) 
 
@@ -989,6 +1047,7 @@ def read_lost_pets_page(request: Request):
             "color": request.query_params.get("color", ""),
             "location": request.query_params.get("location", ""),
         },
+        "notification_context": get_notification_context(current_user),
     }
     return templates.TemplateResponse("lost_found_list.html", context)
 
@@ -1027,6 +1086,7 @@ def read_found_pets_page(request: Request):
             "color": request.query_params.get("color", ""),
             "location": request.query_params.get("location", ""),
         },
+        "notification_context": get_notification_context(current_user),
     }
     return templates.TemplateResponse("lost_found_list.html", context)
 
@@ -1235,7 +1295,8 @@ def read_admin_dashboard(request: Request):
         },
         "logs": list(reversed(logs[-10:])),  # latest 10
         "suggested_matches": suggested_matches,
-        "filters": {"breed": request.query_params.get("breed", ""), "color": request.query_params.get("color", ""), "location": request.query_params.get("location", "")}
+        "filters": {"breed": request.query_params.get("breed", ""), "color": request.query_params.get("color", ""), "location": request.query_params.get("location", "")},
+        "notification_context": get_notification_context(current_user)
     }
     return templates.TemplateResponse("admin_dashboard.html", context) 
 
@@ -1342,9 +1403,9 @@ def read_user_dashboard(request: Request):
         "community_found_reports": community_found_reports,
         "suggested_matches": suggested_matches,
         "suggestions_map": suggestions_map,
-        "notifications": all_notifications,
         "announcements": announcements,
-        "filters": {"breed": "", "color": "", "location": ""}
+        "filters": {"breed": "", "color": "", "location": ""},
+        "notification_context": get_notification_context(current_user),
     }
 
     return templates.TemplateResponse("user_dashboard.html", context) 
@@ -1469,7 +1530,7 @@ def read_case_detail(request: Request, pet_id: str):
     if not pet:
         return RedirectResponse(url=f"/user/dashboard?error=Case+not+found", status_code=HTTP_303_SEE_OTHER)
 
-    context = {"request": request, "user_role": user_role, "current_user": current_user, "pet": pet}
+    context = {"request": request, "user_role": user_role, "current_user": current_user, "pet": pet, "notification_context": get_notification_context(current_user)}
     return templates.TemplateResponse(request, "case_detail.html", context) 
 
 
@@ -1485,6 +1546,7 @@ def read_admin_users(request: Request):
             "user_role": user_role,
             "current_user": current_user,
             "users": users,
+            "notification_context": get_notification_context(current_user),
         },
     )
 
@@ -1750,6 +1812,7 @@ def read_admin_exports(request: Request):
         "current_user": current_user,
         "exports": exports,
         "scheduled": scheduled_exports,
+        "notification_context": get_notification_context(current_user),
     }
     return templates.TemplateResponse("admin_exports.html", context)
 
@@ -1858,7 +1921,8 @@ def read_admin_pending(request: Request):
         "pending_found_reports": pending_found_reports,
         "info_reports": info_reports,
         "user_role": user_role,
-        "status": status
+        "status": status,
+        "notification_context": get_notification_context(current_user)
     }
     return templates.TemplateResponse("admin_pending.html", context) 
 
@@ -2084,7 +2148,7 @@ def create_announcement_page(request: Request):
 
         return RedirectResponse(url="/login?error=Admin access required.", status_code=HTTP_303_SEE_OTHER)
 
-    context = {"request": request, "user_role": user_role, "current_user": current_user}
+    context = {"request": request, "user_role": user_role, "current_user": current_user, "notification_context": get_notification_context(current_user)}
 
     return templates.TemplateResponse("admin_create_announcement.html", context)
 
@@ -2143,7 +2207,8 @@ def list_announcements(request: Request):
 
         "current_user": current_user,
 
-        "announcements": sorted(announcements_list, key=lambda x: x.created_at, reverse=True)
+        "announcements": sorted(announcements_list, key=lambda x: x.created_at, reverse=True),
+        "notification_context": get_notification_context(current_user)
 
     }
 
@@ -2260,6 +2325,7 @@ def approved_registration_history_page(request: Request):
         "approved_regs": approved_regs,
         "approved_reports": approved_reports,
         "resolved_reports": resolved_reports,
+        "notification_context": get_notification_context(current_user),
     }
     return templates.TemplateResponse("admin_approved_history.html", context)
 
