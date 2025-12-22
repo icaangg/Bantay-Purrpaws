@@ -869,79 +869,203 @@ def process_register_pet(
     # 4. Redirect the user back to the register page with a success status
     return RedirectResponse(url=f"/register?status=registered", status_code=HTTP_303_SEE_OTHER)
 
-# --- 3. Report Animal Endpoints ---
+# --- 3. Turnover to Shelter Endpoints ---
 
-@app.get("/report-animal", tags=["Pet Management"])
-def read_report_animal_page(request: Request):
-    """Renders the animal reporting page."""
+@app.get("/turnover-to-shelter", tags=["Pet Management"])
+def read_turnover_to_shelter_page(request: Request):
+    """Renders the pet turnover to shelter page."""
     user_role, current_user = resolve_user(request)
-    status = request.query_params.get('status') # Added to read status
-    context = {"request": request, "user_role": user_role, "current_user": current_user, "status": status, "notification_context": get_notification_context(current_user)}
-    return templates.TemplateResponse(name="report_animal.html", context=context)
+    if not current_user:
+        return RedirectResponse(url="/login?error=Please login to turnover a pet to the shelter.", status_code=HTTP_303_SEE_OTHER)
+    status = request.query_params.get('status')
+    context = {
+        "request": request,
+        "user_role": user_role,
+        "current_user": current_user,
+        "status": status,
+        "notification_context": get_notification_context(current_user)
+    }
+    return templates.TemplateResponse(name="turnover_to_shelter.html", context=context)
 
-@app.post("/report-animal", status_code=HTTP_303_SEE_OTHER, tags=["Pet Management"])
-def process_report_animal(
+@app.post("/turnover-to-shelter", status_code=HTTP_303_SEE_OTHER, tags=["Pet Management"])
+def process_turnover_to_shelter(
     request: Request,
-    name: str = Form(...),
+    # Owner Information
+    owner_full_name: str = Form(...),
+    owner_address: str = Form(...),
+    owner_contact: str = Form(...),
+    owner_email: str = Form(...),
+    valid_id_presented: str = Form(...),
+    id_type_number: str = Form(""),
+    photo_taken_onsite: str = Form(""),
+    photo_attached: str = Form(""),
+    owner_photo: Optional[UploadFile] = File(None),
+    # Pet Information
+    pet_name: str = Form(...),
+    species: str = Form(...),
+    species_other_text: str = Form(""),
     breed: str = Form(...),
-    color: str = Form(...),
-    species: Optional[str] = Form(None),  # Accept but not stored yet
-    date_last_seen: Optional[str] = Form(None),
-    description: Optional[str] = Form(None),
-    photo_file: UploadFile = File(None)
+    color_markings: str = Form(...),
+    sex: str = Form(...),
+    age: str = Form(""),
+    weight: str = Form(""),
+    spayed_neutered: str = Form(...),
+    pet_photo: Optional[UploadFile] = File(None),
+    # Health & Medical History
+    vaccination_status: str = Form(...),
+    last_vaccination_date: str = Form(""),
+    known_illnesses: str = Form(""),
+    medications: str = Form(""),
+    behavior_notes: str = Form(""),
+    # Reason for Turnover
+    reason_turnover: List[str] = Form([]),
+    reason_other_text: str = Form(""),
+    additional_explanation: str = Form(""),
+    # Interview Availability
+    owner_available_interview: str = Form(...),
+    interview_type: List[str] = Form([]),
+    preferred_date: str = Form(""),
+    preferred_time: str = Form(""),
+    interview_conducted_by: str = Form(""),
+    interview_date_time: str = Form(""),
+    interview_notes: str = Form(""),
+    eligibility_result: str = Form(""),
+    eligibility_reason: str = Form(""),
+    # Items Turned Over
+    items_turned_over: List[str] = Form([]),
+    items_other_text: str = Form(""),
+    # Declaration
+    owner_representative_name: str = Form(...),
+    signature: str = Form(...),
+    declaration_date: str = Form(...),
 ):
-    """Handles stray/lost animal report submission and adds it to the pending reports queue."""
-    user_role = get_user_role(request)
+    """Handles pet turnover to shelter form submission."""
+    user_role, current_user = resolve_user(request)
+    if not current_user:
+        return RedirectResponse(url="/login?error=Please login to turnover a pet to the shelter.", status_code=HTTP_303_SEE_OTHER)
     
     import traceback
     try:
-        # 1. Handle file upload (if any)
-        photo_filename = save_upload_file(photo_file)
-        # Get current user and auto-populate contact info
-        _, current_user = resolve_user(request)
-        reporter_user_id = current_user.user_id if current_user else None
+        # Handle file uploads
+        pet_photo_filename = save_upload_file(pet_photo)
+        owner_photo_filename = save_upload_file(owner_photo)
         
-        # Auto-populate reporter contact from logged-in user
-        if current_user:
-            # Use mobile number only, not email
-            reporter_contact = current_user.mobile_number or "N/A"
-            # Use user's address as location, or default to "Not specified"
-            location_data = current_user.address if current_user.address else "Not specified"
-        else:
-            return RedirectResponse(url="/login?error=Please login to report an animal.", status_code=HTTP_303_SEE_OTHER)
+        # Determine final species
+        final_species = species_other_text if species == "other" and species_other_text else species
+        
+        # Determine vaccination status boolean
+        vax_status_bool = vaccination_status == "complete"
+        
+        # Format reason for turnover
+        reason_list = ", ".join(reason_turnover) if reason_turnover else "Not specified"
+        if reason_other_text:
+            reason_list += f" (Other: {reason_other_text})"
+        
+        # Format items turned over
+        items_list = ", ".join(items_turned_over) if items_turned_over else "None"
+        if items_other_text:
+            items_list += f" (Other: {items_other_text})"
+        
+        # Format interview type
+        interview_type_list = ", ".join(interview_type) if interview_type else "Not specified"
+        
+        # Create comprehensive notes with all turnover information
+        turnover_notes = f"""
+TURNOVER FORM DETAILS:
 
-        # 2. Create the new PetInDB object
-        new_report = PetInDB(
+OWNER INFORMATION:
+- Full Name: {owner_full_name}
+- Address: {owner_address}
+- Contact: {owner_contact}
+- Email: {owner_email}
+- Valid ID Presented: {valid_id_presented}
+- ID Type & Number: {id_type_number or 'N/A'}
+- Photo Taken On-site: {photo_taken_onsite or 'No'}
+- Photo Attached: {photo_attached or 'No'}
+
+PET INFORMATION:
+- Pet Name: {pet_name}
+- Species: {final_species}
+- Breed: {breed}
+- Color/Markings: {color_markings}
+- Sex: {sex}
+- Age: {age or 'Not specified'}
+- Weight: {weight or 'Not specified'}
+- Spayed/Neutered: {spayed_neutered}
+
+HEALTH & MEDICAL HISTORY:
+- Vaccination Status: {vaccination_status}
+- Last Vaccination Date: {last_vaccination_date or 'N/A'}
+- Known Illnesses: {known_illnesses or 'None'}
+- Medications: {medications or 'None'}
+- Behavior Notes: {behavior_notes or 'None'}
+
+REASON FOR TURNOVER:
+{reason_list}
+Additional Explanation: {additional_explanation or 'None'}
+
+INTERVIEW AVAILABILITY:
+- Owner Available for Interview: {owner_available_interview}
+- Preferred Interview Type: {interview_type_list}
+- Preferred Date: {preferred_date or 'Not specified'}
+- Preferred Time: {preferred_time or 'Not specified'}
+- Interview Conducted By: {interview_conducted_by or 'N/A'}
+- Interview Date & Time: {interview_date_time or 'N/A'}
+- Interview Notes: {interview_notes or 'None'}
+- Eligibility Result: {eligibility_result or 'Pending'}
+- Eligibility Reason: {eligibility_reason or 'N/A'}
+
+ITEMS TURNED OVER:
+{items_list}
+
+DECLARATION:
+- Owner/Representative Name: {owner_representative_name}
+- Signature: {signature}
+- Date: {declaration_date}
+        """
+        
+        # Create the new PetInDB object for turnover
+        new_turnover = PetInDB(
             pet_id=uuid4(),
-            name=name,
+            name=pet_name,
             breed=breed,
-            color=color,
-            location_data=location_data,
-            vaccination_status=False, # Default to false for strays
-            is_stray=True,
-            is_found=False,  # Reports are for shelter, not lost/found
-            photo_url=photo_filename,
-            reporter_contact=reporter_contact,
-            reporter_user_id=reporter_user_id,
+            color=color_markings,
+            location_data=owner_address,
+            vaccination_status=vax_status_bool,
+            is_stray=True,  # Turnover pets are considered strays for the shelter
+            is_found=False,
+            photo_url=pet_photo_filename,
+            reporter_contact=owner_contact,
+            reporter_user_id=current_user.user_id,
             status="pending",
-            notes=[],
-            date_reported=date_last_seen,
-            description=description,
+            notes=[turnover_notes.strip()],
+            date_reported=declaration_date,
+            description=f"Pet turnover: {pet_name} ({final_species}, {breed}). Reason: {reason_list}",
         )
 
-        # 3. Add report to pending reports queue
-        pending_reports.append(new_report)
+        # Add to pending reports queue
+        pending_reports.append(new_turnover)
         save_state()
-        logs.append(f"Reported animal '{name}' pending review.")
+        logs.append(f"Pet turnover submitted: '{pet_name}' from {owner_full_name} pending review.")
         save_state()
 
-        # 4. Redirect the user back to the report page with a success status
-        return RedirectResponse(url=f"/report-animal?status=reported", status_code=HTTP_303_SEE_OTHER)
+        return RedirectResponse(url=f"/turnover-to-shelter?status=submitted", status_code=HTTP_303_SEE_OTHER)
     except Exception as e:
         tb = traceback.format_exc()
-        logs.append(f"Error processing report: {e}\n{tb}")
+        logs.append(f"Error processing turnover: {e}\n{tb}")
         save_state()
-        return RedirectResponse(url=f"/report-animal?status=error", status_code=HTTP_303_SEE_OTHER)
+        return RedirectResponse(url=f"/turnover-to-shelter?error=Error processing turnover form", status_code=HTTP_303_SEE_OTHER)
+
+# Keep old route for backward compatibility (redirects to new route)
+@app.get("/report-animal", tags=["Pet Management"])
+def read_report_animal_page_redirect(request: Request):
+    """Redirects old report-animal route to turnover-to-shelter."""
+    return RedirectResponse(url="/turnover-to-shelter", status_code=HTTP_303_SEE_OTHER)
+
+@app.post("/report-animal", status_code=HTTP_303_SEE_OTHER, tags=["Pet Management"])
+def process_report_animal_redirect(request: Request):
+    """Redirects old report-animal POST to turnover-to-shelter."""
+    return RedirectResponse(url="/turnover-to-shelter", status_code=HTTP_303_SEE_OTHER)
 
 # --- 4. View All Pets Endpoint ---
 
@@ -961,6 +1085,8 @@ def read_view_pets_page(request: Request):
     owned_pets = [p for p in approved_pets if not p.is_stray]
     # Auto-display all pets if no search, otherwise filter
     filtered = [p for p in owned_pets if matches(p)] if search_performed else owned_pets
+    # Limit to 10 pets
+    filtered = filtered[:10]
     context = {
         "request": request,
         "pets": filtered,  # template expects 'pets'
@@ -1023,6 +1149,221 @@ def process_adopt_request(request: Request, pet_id: str = Form(...)):
         logs.append(f"Error processing adoption request: {e}")
         save_state()
         return RedirectResponse(url="/view-all-pets?error=Error processing request", status_code=HTTP_303_SEE_OTHER)
+
+
+@app.get("/adoption-application", tags=["Core Pages"])
+def read_adoption_application(request: Request):
+    """Display the adoption application form."""
+    user_role, current_user = resolve_user(request)
+    if not current_user:
+        return RedirectResponse(url="/login?error=Login required to apply for adoption.", status_code=HTTP_303_SEE_OTHER)
+    
+    pet_id = request.query_params.get("pet_id")
+    pet = None
+    
+    if pet_id:
+        try:
+            pet_uuid = UUID(pet_id)
+            pet = next((p for p in approved_pets if p.pet_id == pet_uuid), None)
+            if not pet:
+                return RedirectResponse(url="/view-all-pets?error=Pet not found", status_code=HTTP_303_SEE_OTHER)
+            
+            # Don't allow self-adoption
+            if pet.owner_user_id and str(pet.owner_user_id) == str(current_user.user_id):
+                return RedirectResponse(url="/view-all-pets?error=Cannot apply for adoption of your own pet", status_code=HTTP_303_SEE_OTHER)
+        except ValueError:
+            return RedirectResponse(url="/view-all-pets?error=Invalid pet ID", status_code=HTTP_303_SEE_OTHER)
+    
+    context = {
+        "request": request,
+        "user_role": user_role,
+        "current_user": current_user,
+        "pet": pet,
+        "notification_context": get_notification_context(current_user),
+    }
+    return templates.TemplateResponse("adoption_application.html", context)
+
+
+@app.post("/adoption-application", status_code=HTTP_303_SEE_OTHER, tags=["Core Pages"])
+def process_adoption_application(
+    request: Request,
+    pet_id: str = Form(...),
+    first_name: str = Form(...),
+    last_name: str = Form(...),
+    address: str = Form(...),
+    phone: str = Form(...),
+    email: str = Form(...),
+    birth_date: str = Form(...),
+    occupation: str = Form(""),
+    company: str = Form(...),
+    social_media: str = Form(""),
+    status: str = Form(...),
+    pronouns: str = Form(...),
+    adoption_prompt: List[str] = Form([]),
+    adopted_before: str = Form(...),
+    alt_first_name: str = Form(...),
+    alt_last_name: str = Form(...),
+    alt_relationship: str = Form(...),
+    alt_phone: str = Form(...),
+    alt_email: str = Form(...),
+    looking_to_adopt: str = Form(...),
+    specific_animal: str = Form(...),
+    ideal_pet: str = Form(...),
+    building_type: str = Form(...),
+    do_rent: str = Form(...),
+    pet_if_move: str = Form(...),
+    live_with: List[str] = Form([]),
+    household_allergic: str = Form(...),
+    care_responsible: str = Form(...),
+    financial_responsible: str = Form(...),
+    emergency_care: str = Form(...),
+    hours_alone: str = Form(...),
+    introduction_steps: str = Form(...),
+    family_support: str = Form(...),
+    family_support_details: str = Form(""),
+    has_other_pets: str = Form(...),
+    had_pets_past: str = Form(...),
+    home_photos: List[UploadFile] = File(default=[]),
+    valid_id: UploadFile = File(...),
+    zoom_interview_date: str = Form(...),
+    zoom_hour: str = Form(""),
+    zoom_minute: str = Form(""),
+    zoom_ampm: str = Form("AM"),
+    can_visit_shelter: str = Form(...),
+):
+    """Process the adoption application form submission."""
+    user_role, current_user = resolve_user(request)
+    if not current_user:
+        return RedirectResponse(url="/login?error=Login required to apply for adoption.", status_code=HTTP_303_SEE_OTHER)
+    
+    global notifications
+    try:
+        pet_uuid = UUID(pet_id)
+        pet = next((p for p in approved_pets if p.pet_id == pet_uuid), None)
+        
+        if not pet:
+            return RedirectResponse(url="/view-all-pets?error=Pet not found", status_code=HTTP_303_SEE_OTHER)
+        
+        # Check if pet has an owner user_id
+        if not pet.owner_user_id:
+            return RedirectResponse(url="/view-all-pets?error=Pet owner information not available", status_code=HTTP_303_SEE_OTHER)
+        
+        # Don't allow self-adoption
+        if str(pet.owner_user_id) == str(current_user.user_id):
+            return RedirectResponse(url="/view-all-pets?error=Cannot apply for adoption of your own pet", status_code=HTTP_303_SEE_OTHER)
+        
+        # Validate family support details if "No" was selected
+        if family_support == "no" and not family_support_details.strip():
+            return RedirectResponse(url=f"/adoption-application?pet_id={pet_id}&error=Please explain why family members do not support the adoption", status_code=HTTP_303_SEE_OTHER)
+        
+        # Process file uploads
+        home_photos_info = []
+        if home_photos:
+            for photo in home_photos:
+                if photo and hasattr(photo, 'filename') and photo.filename:
+                    try:
+                        saved_filename = save_upload_file(photo)
+                        if saved_filename:
+                            home_photos_info.append(saved_filename)
+                    except Exception as e:
+                        logs.append(f"Error saving home photo: {e}")
+        
+        valid_id_filename = "Not provided"
+        if valid_id and hasattr(valid_id, 'filename') and valid_id.filename:
+            try:
+                saved_id_filename = save_upload_file(valid_id)
+                if saved_id_filename:
+                    valid_id_filename = saved_id_filename
+            except Exception as e:
+                logs.append(f"Error saving valid ID: {e}")
+        
+        # Format adoption prompt
+        prompt_list = ", ".join(adoption_prompt) if adoption_prompt else "Not specified"
+        
+        # Format live with
+        live_with_list = ", ".join(live_with) if live_with else "Not specified"
+        
+        # Format interview time
+        interview_time = ""
+        if zoom_hour and zoom_minute:
+            interview_time = f"{zoom_hour}:{zoom_minute} {zoom_ampm}"
+        
+        # Create detailed adoption application message
+        application_details = f"""
+Adoption Application Details:
+
+APPLICANT'S INFORMATION:
+- Name: {first_name} {last_name}
+- Address: {address}
+- Phone: {phone}
+- Email: {email}
+- Birth Date: {birth_date}
+- Occupation: {occupation or 'N/A'}
+- Company: {company}
+- Social Media: {social_media or 'N/A'}
+- Status: {status}
+- Pronouns: {pronouns}
+- What prompted adoption: {prompt_list}
+- Adopted from PAWS before: {adopted_before}
+
+ALTERNATE CONTACT:
+- Name: {alt_first_name} {alt_last_name}
+- Relationship: {alt_relationship}
+- Phone: {alt_phone}
+- Email: {alt_email}
+
+QUESTIONNAIRE:
+- Looking to adopt: {looking_to_adopt}
+- Applying for specific animal: {specific_animal}
+- Ideal pet description: {ideal_pet}
+- Building type: {building_type}
+- Do you rent: {do_rent}
+- Pet if/when you move: {pet_if_move}
+- Who you live with: {live_with_list}
+- Household allergic to animals: {household_allergic}
+
+PET CARE INFORMATION:
+- Care responsible: {care_responsible}
+- Financial responsible: {financial_responsible}
+- Emergency care: {emergency_care}
+- Hours alone: {hours_alone}
+- Introduction steps: {introduction_steps}
+- Family support: {family_support}{f' (Details: {family_support_details})' if family_support == 'no' else ''}
+- Has other pets: {has_other_pets}
+- Had pets in past: {had_pets_past}
+
+INTERVIEW & VISITATION:
+- Preferred Zoom interview date: {zoom_interview_date}
+- Preferred Zoom interview time: {interview_time or 'Not specified'}
+- Can visit shelter: {can_visit_shelter}
+
+UPLOADS:
+- Home photos: {len(home_photos_info)} file(s) uploaded
+- Valid ID: {valid_id_filename}
+        """
+        
+        # Create notification for the pet owner
+        from datetime import datetime, timezone
+        adoption_notification = Notification(
+            notification_id=uuid4(),
+            user_id=pet.owner_user_id,
+            message=f"{current_user.full_name} ({current_user.email}) has submitted an adoption application for {pet.name}.{application_details}",
+            read=False,
+            timestamp=datetime.now(timezone.utc).isoformat()
+        )
+        notifications.append(adoption_notification)
+        save_state()
+        
+        logs.append(f"Adoption application for '{pet.name}' from {current_user.full_name} to owner {pet.owner_user_id}")
+        save_state()
+        
+        return RedirectResponse(url="/view-all-pets?status=adoption_application_submitted", status_code=HTTP_303_SEE_OTHER)
+    except ValueError:
+        return RedirectResponse(url="/view-all-pets?error=Invalid pet ID", status_code=HTTP_303_SEE_OTHER)
+    except Exception as e:
+        logs.append(f"Error processing adoption application: {e}")
+        save_state()
+        return RedirectResponse(url="/view-all-pets?error=Error processing application", status_code=HTTP_303_SEE_OTHER)
 
 
 @app.get("/lost", tags=["Core Pages"])

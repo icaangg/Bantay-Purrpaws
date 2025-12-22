@@ -27,7 +27,7 @@
                             <li class="nav-item"><a class="nav-link active" href="/">Home</a></li>
                             <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
                             <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
-                            <li class="nav-item"><a class="nav-link" href="/report-animal">Report Animal</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/turnover-to-shelter">Turnover to Shelter</a></li>
                             {% if user_role != 'guest' %}
                             <li class="nav-item">
                                 <a class="nav-link position-relative" href="/notifications">
@@ -83,8 +83,7 @@
                             <div class="cta-group d-flex gap-3 justify-content-center flex-wrap">
                                 {% if user_role != 'guest' %}
                                     <a href="/register" class="btn btn-lg cta-primary">Register Your Pet</a>
-                                    <a href="/report-animal" class="btn btn-lg cta-primary">Report Lost Pet</a>
-                                    <a href="/report-animal" class="btn btn-lg cta-primary">Report Found</a>
+                                    <a href="/turnover-to-shelter" class="btn btn-lg cta-primary">Turnover to Shelter</a>
                                 {% else %}
                                     <a href="/user-register" class="btn btn-lg cta-primary">Sign Up to Get Started</a>
                                     <a href="/login" class="btn btn-lg cta-primary">Login</a>
@@ -190,7 +189,7 @@
                                 <div class="mb-3" style="font-size: 3rem;">🔍</div>
                                 <h4 class="text-primary mb-3">Lost Pet Reporting</h4>
                                 <p class="mb-3">Report missing animals with essential information and photos.</p>
-                                <a href="/report-animal" class="btn cta-secondary">Report Lost Pet</a>
+                                <a href="/turnover-to-shelter" class="btn cta-secondary">Turnover to Shelter</a>
                             </div>
                         </div>
                         <div class="col-md-6 col-lg-4">
@@ -198,7 +197,7 @@
                                 <div class="mb-3" style="font-size: 3rem;">🏠</div>
                                 <h4 class="text-primary mb-3">Found Animal Reporting</h4>
                                 <p class="mb-3">Submit details about animals found to help reunite them with owners.</p>
-                                <a href="/report-animal" class="btn cta-secondary">Report Found</a>
+                                <a href="/turnover-to-shelter" class="btn cta-secondary">Turnover to Shelter</a>
                             </div>
                         </div>
                         <div class="col-md-6 col-lg-4">

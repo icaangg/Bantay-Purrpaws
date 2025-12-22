@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Turnover to Shelter | Bantay PurrPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-override.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <a class="skip-link sr-only" href="#main-content">Skip to content</a>
+
+    <div class="site-content-wrapper">
+        <header class="main-header">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <a href="/" class="navbar-brand">
+                        <img src="/static/purrpaws-logo.png" alt="Bantay PurrPaws Logo" class="navbar-brand-img">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
+                            <li class="nav-item"><a class="nav-link active" href="/turnover-to-shelter">Turnover to Shelter</a></li>
+                            {% if user_role != 'guest' %}
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="/notifications">
+                                    Notifications
+                                    {% if notification_context and notification_context.has_unread %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                        {{ notification_context.unread_count }}
+                                    </span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if user_role == 'admin' %}
+                                <li class="nav-item"><a class="nav-link text-primary fw-bold" href="/admin/dashboard">Admin</a></li>
+                            {% endif %}
+                        </ul>
+                        <div class="profile-dropdown-container">
+                            <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
+                            {{ current_user.full_name if current_user else 'User' }} ▾
+                            </button>
+                            <div class="profile-dropdown-content">
+                                {% if user_role != 'guest' %}
+                                    <a href="/logout" class="dropdown-item">Log Out</a>
+                                    <a href="/user/dashboard" class="dropdown-item">Dashboard</a>
+                                {% else %}
+                                    <a href="/login" class="dropdown-item">Login</a>
+                                    <a href="/user-register" class="dropdown-item">Register</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main-content" class="content" tabindex="-1">
+            <div class="container">
+                <div class="mt-3">
+                    {% include 'partials/back_button.html' %}
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="text-center mb-4">
+                            <img src="/static/ormoc-strays-oasis-logo.png" alt="ORMOC STRAYS OASIS Logo" class="mb-3" style="max-width: 220px; height: auto; margin-top: 0;">
+                            <h1 class="text-primary mb-2">Pet Turnover Form</h1>
+                            <p class="text-muted"><em>* indicates required fields</em></p>
+                        </div>
+
+                        {% if request.query_params.get('status') == 'submitted' %}
+                            <div class="alert alert-success">
+                                Thank you! Your turnover form has been submitted and is awaiting review.
+                            </div>
+                        {% elif request.query_params.get('error') %}
+                            <div class="alert alert-danger">{{ request.query_params.get('error') }}</div>
+                        {% endif %}
+
+                        <form method="POST" action="/turnover-to-shelter" enctype="multipart/form-data">
+
+                            <!-- A. Owner Information -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">A. Owner Information</h2>
+                                
+                                <div class="mb-3">
+                                    <label for="owner_full_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="owner_full_name" name="owner_full_name" required
+                                           value="{{ current_user.full_name if current_user and current_user.full_name else '' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="owner_address" class="form-label">Address <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="owner_address" name="owner_address" required
+                                           value="{{ current_user.address if current_user and current_user.address else '' }}">
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="owner_contact" class="form-label">Contact Number <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="owner_contact" name="owner_contact" required
+                                               value="{{ current_user.mobile_number if current_user and current_user.mobile_number else '' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="owner_email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="owner_email" name="owner_email" required
+                                               value="{{ current_user.email if current_user and current_user.email else '' }}">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Valid ID Presented <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="valid_id_presented" id="id_yes" value="yes" required>
+                                            <label class="form-check-label" for="id_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="valid_id_presented" id="id_no" value="no" required>
+                                            <label class="form-check-label" for="id_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="id_type_number" class="form-label">ID Type & Number</label>
+                                    <input type="text" class="form-control" id="id_type_number" name="id_type_number" placeholder="e.g., Driver's License - D12-345678">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Owner Photo (for verification)</label>
+                                    <div class="mb-2">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" name="photo_taken_onsite" id="photo_onsite" value="yes">
+                                            <label class="form-check-label" for="photo_onsite">Photo taken on-site</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" name="photo_attached" id="photo_attached" value="yes">
+                                            <label class="form-check-label" for="photo_attached">Photo attached (ID/selfie)</label>
+                                        </div>
+                                    </div>
+                                    <label for="owner_photo" class="form-label">Paste or attach photo here:</label>
+                                    <input type="file" class="form-control" id="owner_photo" name="owner_photo" accept="image/*">
+                                </div>
+                            </div>
+
+                            <!-- B. Pet Information -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">B. Pet Information</h2>
+                                
+                                <div class="mb-3">
+                                    <label for="pet_name" class="form-label">Pet Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="pet_name" name="pet_name" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Species <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="species" id="species_dog" value="dog" required>
+                                            <label class="form-check-label" for="species_dog">Dog</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="species" id="species_cat" value="cat" required>
+                                            <label class="form-check-label" for="species_cat">Cat</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="species" id="species_other" value="other" required>
+                                            <label class="form-check-label" for="species_other">Other:</label>
+                                        </div>
+                                        <input type="text" class="form-control d-inline-block mt-2" id="species_other_text" name="species_other_text" style="width: 200px;" placeholder="Specify">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="breed" class="form-label">Breed <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="breed" name="breed" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="color_markings" class="form-label">Color/Markings <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="color_markings" name="color_markings" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Sex <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="sex" id="sex_male" value="male" required>
+                                            <label class="form-check-label" for="sex_male">Male</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="sex" id="sex_female" value="female" required>
+                                            <label class="form-check-label" for="sex_female">Female</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="age" class="form-label">Age (Approx.)</label>
+                                        <input type="text" class="form-control" id="age" name="age" placeholder="e.g., 2 years, 6 months">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="weight" class="form-label">Weight (if known)</label>
+                                        <input type="text" class="form-control" id="weight" name="weight" placeholder="e.g., 15 kg">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Spayed/Neutered <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="spayed_neutered" id="spayed_yes" value="yes" required>
+                                            <label class="form-check-label" for="spayed_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="spayed_neutered" id="spayed_no" value="no" required>
+                                            <label class="form-check-label" for="spayed_no">No</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="spayed_neutered" id="spayed_unknown" value="unknown" required>
+                                            <label class="form-check-label" for="spayed_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="pet_photo" class="form-label">Pet Photo</label>
+                                    <input type="file" class="form-control" id="pet_photo" name="pet_photo" accept="image/*">
+                                </div>
+                            </div>
+
+                            <!-- C. Health & Medical History -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">C. Health & Medical History</h2>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Vaccination Status <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="vaccination_status" id="vax_complete" value="complete" required>
+                                            <label class="form-check-label" for="vax_complete">Complete</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="vaccination_status" id="vax_incomplete" value="incomplete" required>
+                                            <label class="form-check-label" for="vax_incomplete">Incomplete</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="vaccination_status" id="vax_unknown" value="unknown" required>
+                                            <label class="form-check-label" for="vax_unknown">Unknown</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="last_vaccination_date" class="form-label">Last Vaccination Date (if any)</label>
+                                    <input type="date" class="form-control" id="last_vaccination_date" name="last_vaccination_date">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="known_illnesses" class="form-label">Known Illnesses/Conditions</label>
+                                    <input type="text" class="form-control" id="known_illnesses" name="known_illnesses" placeholder="e.g., diabetes, arthritis">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="medications" class="form-label">Medications Currently Given</label>
+                                    <input type="text" class="form-control" id="medications" name="medications" placeholder="e.g., insulin, pain medication">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="behavior_notes" class="form-label">Behavior Notes (e.g., aggressive, shy, friendly)</label>
+                                    <textarea class="form-control" id="behavior_notes" name="behavior_notes" rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- D. Reason for Turnover -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">D. Reason for Turnover</h2>
+                                <p class="text-muted mb-3"><small>(Please check all that apply)</small></p>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="reason_turnover" id="reason_financial" value="financial_constraints">
+                                        <label class="form-check-label" for="reason_financial">Financial constraints</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="reason_turnover" id="reason_living" value="change_living_situation">
+                                        <label class="form-check-label" for="reason_living">Change in living situation</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="reason_turnover" id="reason_health" value="health_issues_owner">
+                                        <label class="form-check-label" for="reason_health">Health issues of owner</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="reason_turnover" id="reason_behavioral" value="behavioral_issues">
+                                        <label class="form-check-label" for="reason_behavioral">Behavioral issues</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="reason_turnover" id="reason_stray" value="stray_rescue_surrender">
+                                        <label class="form-check-label" for="reason_stray">Stray/Rescue surrender</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="reason_turnover" id="reason_other" value="other">
+                                        <label class="form-check-label" for="reason_other">Other:</label>
+                                    </div>
+                                    <input type="text" class="form-control mt-2" id="reason_other_text" name="reason_other_text" placeholder="Specify other reason">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="additional_explanation" class="form-label">Additional Explanation (optional)</label>
+                                    <textarea class="form-control" id="additional_explanation" name="additional_explanation" rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- E. Interview Availability & Assessment -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">E. Interview Availability & Assessment</h2>
+                                <p class="text-muted mb-3"><small>(To ensure legitimacy of the turnover)</small></p>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">Is the owner available for interview? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="owner_available_interview" id="available_yes" value="yes" required>
+                                            <label class="form-check-label" for="available_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="owner_available_interview" id="available_no" value="no" required>
+                                            <label class="form-check-label" for="available_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Preferred Interview Type:</label>
+                                    <div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="interview_type" id="interview_inperson" value="in_person">
+                                            <label class="form-check-label" for="interview_inperson">In-person</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="interview_type" id="interview_phone" value="phone_call">
+                                            <label class="form-check-label" for="interview_phone">Phone Call</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="interview_type" id="interview_video" value="video_call">
+                                            <label class="form-check-label" for="interview_video">Video Call</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="preferred_date" class="form-label">Preferred Date</label>
+                                        <input type="date" class="form-control" id="preferred_date" name="preferred_date">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="preferred_time" class="form-label">Preferred Time</label>
+                                        <input type="time" class="form-control" id="preferred_time" name="preferred_time">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="interview_conducted_by" class="form-label">Interview Conducted By</label>
+                                    <input type="text" class="form-control" id="interview_conducted_by" name="interview_conducted_by" placeholder="Staff name">
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="interview_date_time" class="form-label">Interview Date & Time</label>
+                                        <input type="datetime-local" class="form-control" id="interview_date_time" name="interview_date_time">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="interview_notes" class="form-label">Key Interview Notes / Assessment</label>
+                                    <textarea class="form-control" id="interview_notes" name="interview_notes" rows="4"></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Eligibility Result:</label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="eligibility_result" id="eligibility_approved" value="approved">
+                                            <label class="form-check-label" for="eligibility_approved">Approved for turnover</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="eligibility_result" id="eligibility_pending" value="pending">
+                                            <label class="form-check-label" for="eligibility_pending">Pending</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="eligibility_result" id="eligibility_not_approved" value="not_approved">
+                                            <label class="form-check-label" for="eligibility_not_approved">Not approved</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="eligibility_reason" class="form-label">Reason (if pending/not approved)</label>
+                                    <textarea class="form-control" id="eligibility_reason" name="eligibility_reason" rows="3"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- E. Items Turned Over with Pet -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">E. Items Turned Over with Pet</h2>
+                                <p class="text-muted mb-3"><small>(Please check all that apply)</small></p>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="items_turned_over" id="item_collar" value="collar_leash">
+                                        <label class="form-check-label" for="item_collar">Collar/Leash</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="items_turned_over" id="item_cage" value="cage_crate">
+                                        <label class="form-check-label" for="item_cage">Cage/Crate</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="items_turned_over" id="item_food" value="food">
+                                        <label class="form-check-label" for="item_food">Food</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="items_turned_over" id="item_toys" value="toys">
+                                        <label class="form-check-label" for="item_toys">Toys</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="items_turned_over" id="item_medical" value="medical_records">
+                                        <label class="form-check-label" for="item_medical">Medical Records</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="items_turned_over" id="item_other" value="other">
+                                        <label class="form-check-label" for="item_other">Other:</label>
+                                    </div>
+                                    <input type="text" class="form-control mt-2" id="items_other_text" name="items_other_text" placeholder="Specify other items">
+                                </div>
+                            </div>
+
+                            <!-- F. Declaration and Consent -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">F. Declaration and Consent</h2>
+                                
+                                <div class="mb-3">
+                                    <p>I, the undersigned, hereby voluntarily surrender the above-described pet to the organization named above. I confirm that I am the legal owner or authorized individual to surrender this pet. I understand that upon signing this form, ownership and decision-making responsibility for the pet will be transferred to the organization, including but not limited to medical care, adoption, or other disposition in accordance with their policies.</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <p>I certify that the information provided is true and correct to the best of my knowledge.</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="owner_representative_name" class="form-label">Owner/Representative Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="owner_representative_name" name="owner_representative_name" required
+                                           value="{{ current_user.full_name if current_user and current_user.full_name else '' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="signature" class="form-label">Signature <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="signature" name="signature" required placeholder="Type your full name as signature">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="declaration_date" class="form-label">Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="declaration_date" name="declaration_date" required>
+                                </div>
+                            </div>
+
+                            <div class="text-center mb-4">
+                                <button type="submit" class="btn cta-primary btn-lg px-5">Submit Turnover Form</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row py-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="footer-contact">
+                        <a href="tel:(414) 857-0107" class="text-white text-decoration-none me-3">📞 (414) 857 - 0107</a>
+                        <a href="mailto:report@purrpaws.com" class="text-white text-decoration-none">📧 report@purrpaws.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-copyright">
+                        <p class="mb-0">&copy; 2025 Bantay PurrPaws. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set today's date as default for declaration date
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const declarationDate = document.getElementById('declaration_date');
+            if (declarationDate && !declarationDate.value) {
+                declarationDate.value = today;
+            }
+        });
+
+        // Profile dropdown functionality
+        document.addEventListener('click', function(e){
+            const btn = e.target.closest('.profile-main-link');
+            if(btn){
+                const container = btn.closest('.profile-dropdown-container');
+                const isOpen = container.classList.toggle('open');
+                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                e.preventDefault();
+            } else {
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape'){
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

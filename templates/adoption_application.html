@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adoption Application | Bantay PurrPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-override.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="site-content-wrapper">
+        <a class="skip-link sr-only" href="#main-content">Skip to content</a>
+
+        <header class="main-header shadow-sm">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <a href="/" class="navbar-brand">
+                        <img src="/static/purrpaws-logo.png" alt="Bantay PurrPaws Logo" class="navbar-brand-img">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/view-all-pets">View Pets</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/register">Register Pet</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/turnover-to-shelter">Turnover to Shelter</a></li>
+                            {% if user_role != 'guest' %}
+                            <li class="nav-item">
+                                <a class="nav-link position-relative" href="/notifications">
+                                    Notifications
+                                    {% if notification_context and notification_context.has_unread %}
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                                        {{ notification_context.unread_count }}
+                                    </span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if user_role == 'admin' %}
+                                <li class="nav-item"><a class="nav-link text-primary fw-bold" href="/admin/dashboard">Admin</a></li>
+                            {% endif %}
+                        </ul>
+                        <div class="profile-dropdown-container">
+                            <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
+                                {{ current_user.full_name if current_user else 'User' }} ▾
+                            </button>
+                            <div class="profile-dropdown-content">
+                                {% if user_role != 'guest' %}
+                                    <a href="/logout" class="dropdown-item">Log Out</a>
+                                    <a href="/user/dashboard" class="dropdown-item">Dashboard</a>
+                                {% else %}
+                                    <a href="/login" class="dropdown-item">Login</a>
+                                    <a href="/user-register" class="dropdown-item">Register</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+        
+        <main id="main-content" class="content py-5" tabindex="-1">
+            <div class="container">
+                {% include 'partials/back_button.html' %}
+                
+                {% if request.query_params.get('error') %}
+                    <div class="alert alert-danger">{{ request.query_params.get('error') }}</div>
+                {% endif %}
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-10">
+                        <div class="text-center mb-4">
+                            <h1 class="text-primary mb-2">Adoption Application</h1>
+                            <p class="text-muted"><em>* indicates required fields</em></p>
+                        </div>
+
+                        {% if pet %}
+                        <div class="alert alert-info mb-4">
+                            <h5 class="mb-2">Pet Information</h5>
+                            <p class="mb-1"><strong>Name:</strong> {{ pet.name }}</p>
+                            <p class="mb-1"><strong>Breed:</strong> {{ pet.breed }}</p>
+                            <p class="mb-1"><strong>Color:</strong> {{ pet.color }}</p>
+                            <p class="mb-0"><strong>Location:</strong> {{ pet.location_data }}</p>
+                        </div>
+                        {% endif %}
+
+                        <form method="POST" action="/adoption-application" enctype="multipart/form-data">
+                            <input type="hidden" name="pet_id" value="{{ pet.pet_id if pet else '' }}">
+
+                            <!-- Applicant's Information -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">Applicant's Information</h2>
+                                
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" required 
+                                               value="{{ current_user.first_name if current_user and current_user.first_name else '' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" required
+                                               value="{{ current_user.last_name if current_user and current_user.last_name else '' }}">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="address" name="address" required
+                                           value="{{ current_user.address if current_user and current_user.address else '' }}">
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="phone" class="form-label">Phone <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="phone" name="phone" required
+                                               value="{{ current_user.mobile_number if current_user and current_user.mobile_number else '' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="email" name="email" required
+                                               value="{{ current_user.email if current_user and current_user.email else '' }}">
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="birth_date" class="form-label">Birth Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="birth_date" name="birth_date" required
+                                               value="{{ current_user.birthday if current_user and current_user.birthday else '' }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="occupation" class="form-label">Occupation</label>
+                                        <input type="text" class="form-control" id="occupation" name="occupation" 
+                                               placeholder="e.g., Teacher, Engineer">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="company" class="form-label">Company/Business Name <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="company" name="company" required placeholder="Please type N/A if unemployed">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="social_media" class="form-label">Social Media Profile</label>
+                                    <input type="text" class="form-control" id="social_media" name="social_media" placeholder="Enter FB/Twitter/IG Link">
+                                    <small class="text-muted">Please type N/A if no social media</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Status <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="status" id="status_single" value="single" required>
+                                            <label class="form-check-label" for="status_single">Single</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="status" id="status_married" value="married" required>
+                                            <label class="form-check-label" for="status_married">Married</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="status" id="status_others" value="others" required>
+                                            <label class="form-check-label" for="status_others">Others</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Pronouns <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="pronouns" id="pronouns_she" value="she/her" required>
+                                            <label class="form-check-label" for="pronouns_she">She/her</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="pronouns" id="pronouns_he" value="he/him" required>
+                                            <label class="form-check-label" for="pronouns_he">He/him</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="pronouns" id="pronouns_they" value="they/them" required>
+                                            <label class="form-check-label" for="pronouns_they">They/them</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">What prompted you to adopt? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="adoption_prompt" id="prompt_friends" value="friends">
+                                            <label class="form-check-label" for="prompt_friends">Friends</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="adoption_prompt" id="prompt_website" value="website">
+                                            <label class="form-check-label" for="prompt_website">Website</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="adoption_prompt" id="prompt_social" value="social_media">
+                                            <label class="form-check-label" for="prompt_social">Social Media</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="adoption_prompt" id="prompt_other" value="other">
+                                            <label class="form-check-label" for="prompt_other">Other</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Have you adopted from PAWS before? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="adopted_before" id="adopted_before_yes" value="yes" required>
+                                            <label class="form-check-label" for="adopted_before_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="adopted_before" id="adopted_before_no" value="no" required>
+                                            <label class="form-check-label" for="adopted_before_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Alternate Contact -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">Alternate Contact</h2>
+                                <p class="text-muted mb-3"><small>If the applicant is a minor, a parent or a guardian must be the alternate contact and co-sign the application.</small></p>
+                                
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="alt_first_name" class="form-label">First Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="alt_first_name" name="alt_first_name" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="alt_last_name" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="alt_last_name" name="alt_last_name" required>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="alt_relationship" class="form-label">Relationship <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="alt_relationship" name="alt_relationship" required>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label for="alt_phone" class="form-label">Phone <span class="text-danger">*</span></label>
+                                        <input type="tel" class="form-control" id="alt_phone" name="alt_phone" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="alt_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="alt_email" name="alt_email" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Questionnaire -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">Questionnaire</h2>
+                                <p class="text-muted mb-4"><em>In an effort to help the process go smoothly, please be as detailed as possible with your responses to the questions below.</em></p>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">What are you looking to adopt? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="looking_to_adopt" id="adopt_cat" value="cat" required>
+                                            <label class="form-check-label" for="adopt_cat">Cat</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="looking_to_adopt" id="adopt_dog" value="dog" required>
+                                            <label class="form-check-label" for="adopt_dog">Dog</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="looking_to_adopt" id="adopt_both" value="both" required>
+                                            <label class="form-check-label" for="adopt_both">Both</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="looking_to_adopt" id="adopt_not_decided" value="not_decided" required>
+                                            <label class="form-check-label" for="adopt_not_decided">Not decided</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Are you applying to adopt a specific shelter animal? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="specific_animal" id="specific_yes" value="yes" required>
+                                            <label class="form-check-label" for="specific_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="specific_animal" id="specific_no" value="no" required>
+                                            <label class="form-check-label" for="specific_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="ideal_pet" class="form-label">Describe your ideal pet, including its sex, age, appearance, temperament, etc. <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="ideal_pet" name="ideal_pet" rows="5" required></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">What type of building do you live in? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="building_type" id="building_house" value="house" required>
+                                            <label class="form-check-label" for="building_house">House</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="building_type" id="building_apartment" value="apartment" required>
+                                            <label class="form-check-label" for="building_apartment">Apartment</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="building_type" id="building_condo" value="condo" required>
+                                            <label class="form-check-label" for="building_condo">Condo</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="building_type" id="building_other" value="other" required>
+                                            <label class="form-check-label" for="building_other">Other</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Do you rent? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="do_rent" id="rent_yes" value="yes" required>
+                                            <label class="form-check-label" for="rent_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="do_rent" id="rent_no" value="no" required>
+                                            <label class="form-check-label" for="rent_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="pet_if_move" class="form-label">What happens to your pet if or when you move? <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="pet_if_move" name="pet_if_move" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Who do you live with? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="live_with" id="live_alone" value="living_alone">
+                                            <label class="form-check-label" for="live_alone">Living alone</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="live_with" id="live_spouse" value="spouse">
+                                            <label class="form-check-label" for="live_spouse">Spouse</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="live_with" id="live_parents" value="parents">
+                                            <label class="form-check-label" for="live_parents">Parents</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="live_with" id="live_children_over18" value="children_over_18">
+                                            <label class="form-check-label" for="live_children_over18">Children over 18</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="live_with" id="live_children_below18" value="children_below_18">
+                                            <label class="form-check-label" for="live_children_below18">Children below 18</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="live_with" id="live_relatives" value="relatives">
+                                            <label class="form-check-label" for="live_relatives">Relatives</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="live_with" id="live_roommate" value="roommate">
+                                            <label class="form-check-label" for="live_roommate">Roommate(s)</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Are any members of your household allergic to animals? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="household_allergic" id="allergic_yes" value="yes" required>
+                                            <label class="form-check-label" for="allergic_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="household_allergic" id="allergic_no" value="no" required>
+                                            <label class="form-check-label" for="allergic_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pet Care Questions -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">Pet Care Information</h2>
+                                
+                                <div class="mb-3">
+                                    <label for="care_responsible" class="form-label">Who will be responsible for feeding, grooming, and generally caring for your pet? <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="care_responsible" name="care_responsible" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="financial_responsible" class="form-label">Who will be financially responsible for your pet's needs (i.e. food, vet bills, etc.)? <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="financial_responsible" name="financial_responsible" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="emergency_care" class="form-label">Who will look after your pet if you go on vacation or in case of emergency? <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="emergency_care" name="emergency_care" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="hours_alone" class="form-label">How many hours in an average workday will your pet be left alone? <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="hours_alone" name="hours_alone" required placeholder="e.g., 4 hours">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="introduction_steps" class="form-label">What steps will you take to introduce your new pet to his/her new surroundings? <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="introduction_steps" name="introduction_steps" rows="4" required></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Does everyone in the family support your decision to adopt a pet? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="family_support" id="family_support_yes" value="yes" required>
+                                            <label class="form-check-label" for="family_support_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="family_support" id="family_support_no" value="no" required>
+                                            <label class="form-check-label" for="family_support_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3" id="family_support_explanation" style="display: none;">
+                                    <label for="family_support_details" class="form-label">Please explain <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="family_support_details" name="family_support_details" rows="3"></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Do you have other pets? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="has_other_pets" id="has_other_pets_yes" value="yes" required>
+                                            <label class="form-check-label" for="has_other_pets_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="has_other_pets" id="has_other_pets_no" value="no" required>
+                                            <label class="form-check-label" for="has_other_pets_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Have you had pets in the past? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="had_pets_past" id="had_pets_past_yes" value="yes" required>
+                                            <label class="form-check-label" for="had_pets_past_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="had_pets_past" id="had_pets_past_no" value="no" required>
+                                            <label class="form-check-label" for="had_pets_past_no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Photo Upload Section -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">Home Photos</h2>
+                                <p class="mb-3">Please attach photos of your home. This has replaced our on-site ocular inspections.</p>
+                                <ol class="mb-3">
+                                    <li>Front of the house</li>
+                                    <li>Street photo</li>
+                                    <li>Living room</li>
+                                    <li>Dining area</li>
+                                    <li>Kitchen</li>
+                                    <li>Bedroom/s (if your pet will have access)</li>
+                                    <li>Windows (if adopting a cat)</li>
+                                    <li>Front & backyard (if adopting a dog)</li>
+                                </ol>
+                                <p class="text-muted mb-3"><small>We value your privacy. Your photos will not be used for purposes other than this adoption application. <span class="text-danger">*</span></small></p>
+                                <div class="mb-3">
+                                    <label for="home_photos" class="form-label">Upload Home Photos <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" id="home_photos" name="home_photos" multiple accept="image/*" required>
+                                    <small class="text-muted">Max. file size: 8 MB per file.</small>
+                                </div>
+                            </div>
+
+                            <!-- ID Upload Section -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">Valid ID</h2>
+                                <div class="mb-3">
+                                    <label for="valid_id" class="form-label">Upload a valid ID <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" id="valid_id" name="valid_id" accept="image/*,.pdf" required>
+                                    <small class="text-muted">Max. file size: 8 MB.</small>
+                                </div>
+                            </div>
+
+                            <!-- Interview & Visitation Section -->
+                            <div class="feature-box p-4 mb-4">
+                                <h2 class="text-primary mb-3">Interview & Visitation</h2>
+                                <p class="text-muted mb-3"><small>(Minors must be accompanied by a parent or guardian.)</small></p>
+                                
+                                <div class="mb-3">
+                                    <label for="zoom_interview_date" class="form-label">Preferred date for Zoom interview <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="zoom_interview_date" name="zoom_interview_date" required>
+                                    <small class="text-muted">We can't guarantee the availability of your requested time.</small>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Preferred time for Zoom interview</label>
+                                    <div class="row g-2">
+                                        <div class="col-3">
+                                            <input type="number" class="form-control" id="zoom_hour" name="zoom_hour" min="1" max="12" placeholder="HH">
+                                        </div>
+                                        <div class="col-1 text-center pt-2">:</div>
+                                        <div class="col-3">
+                                            <input type="number" class="form-control" id="zoom_minute" name="zoom_minute" min="0" max="59" placeholder="MM">
+                                        </div>
+                                        <div class="col-5">
+                                            <select class="form-select" id="zoom_ampm" name="zoom_ampm">
+                                                <option value="AM">AM</option>
+                                                <option value="PM">PM</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Will you be able to visit the shelter for the meet-and-greet? <span class="text-danger">*</span></label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="can_visit_shelter" id="visit_yes" value="yes" required>
+                                            <label class="form-check-label" for="visit_yes">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="can_visit_shelter" id="visit_no" value="no" required>
+                                            <label class="form-check-label" for="visit_no">No</label>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">We can't guarantee the availability of your requested time.</small>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn cta-primary btn-lg px-5">Submit Application</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row py-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="footer-contact">
+                        <a href="tel:(414) 857-0107" class="text-white text-decoration-none me-3">📞 (414) 857 - 0107</a>
+                        <a href="mailto:report@purrpaws.com" class="text-white text-decoration-none">📧 report@purrpaws.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-copyright">
+                        <p class="mb-0">&copy; 2025 Bantay PurrPaws. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Show/hide family support explanation based on selection
+        document.querySelectorAll('input[name="family_support"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const explanationDiv = document.getElementById('family_support_explanation');
+                const explanationTextarea = document.getElementById('family_support_details');
+                if (this.value === 'no') {
+                    explanationDiv.style.display = 'block';
+                    explanationTextarea.required = true;
+                } else {
+                    explanationDiv.style.display = 'none';
+                    explanationTextarea.required = false;
+                    explanationTextarea.value = '';
+                }
+            });
+        });
+
+        // Profile dropdown functionality
+        document.addEventListener('click', function(e){
+            const btn = e.target.closest('.profile-main-link');
+            if(btn){
+                const container = btn.closest('.profile-dropdown-container');
+                const isOpen = container.classList.toggle('open');
+                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                e.preventDefault();
+            } else {
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape'){
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
