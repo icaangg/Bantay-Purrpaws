@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Adoption Applications | Bantay PurrPaws</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/bootstrap-override.css">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <a class="skip-link sr-only" href="#main-content">Skip to content</a>
+
+    <div class="site-content-wrapper">
+        <header class="main-header">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="container">
+                    <a href="/" class="navbar-brand">
+                        <img src="/static/purrpaws-logo.png" alt="Bantay PurrPaws Logo" class="navbar-brand-img">
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
+                            <li class="nav-item"><a class="nav-link" href="/admin/dashboard">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link active text-primary fw-bold" href="/admin/review-applications">Review Applications</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/announcements">Announcements</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/admin/approved-history">Approved History</a></li>
+                        </ul>
+                        <div class="profile-dropdown-container">
+                            <button class="profile-main-link btn btn-outline-secondary" aria-haspopup="true" aria-expanded="false">
+                                {{ current_user.full_name or 'User' }} ▾
+                            </button>
+                            <div class="profile-dropdown-content">
+                                <a href="/" class="dropdown-item">Home</a>
+                                <a href="/logout" class="dropdown-item">Log Out</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main id="main-content" class="content" tabindex="-1">
+            <div class="container my-4">
+                {% include 'partials/back_button.html' %}
+                <div class="text-center mb-5">
+                    <h1 class="text-primary mb-2">Review Adoption Applications</h1>
+                    <p class="text-muted">Review and contact applicants for pet adoptions</p>
+                </div>
+
+                {% if applications %}
+                    <div class="row g-4">
+                        {% for app in applications %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card h-100 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                            <h5 class="card-title text-primary mb-0">{{ app.pet_name }}</h5>
+                                            <span class="badge {% if app.status == 'pending' %}bg-warning{% elif app.status == 'reviewed' %}bg-info{% elif app.status == 'approved' %}bg-success{% else %}bg-secondary{% endif %}">
+                                                {{ app.status|title }}
+                                            </span>
+                                        </div>
+                                        <p class="card-text mb-2">
+                                            <strong>Applicant:</strong> {{ app.applicant_name }}<br>
+                                            <strong>Email:</strong> {{ app.applicant_email }}<br>
+                                            <strong>Phone:</strong> {{ app.applicant_phone }}
+                                        </p>
+                                        <p class="text-muted small mb-3">
+                                            <strong>Submitted:</strong> {{ app.submitted_at[:10] if app.submitted_at else 'N/A' }}
+                                        </p>
+                                        <div class="d-grid gap-2">
+                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ app.applicant_email|urlencode }}&su={{ ('Adoption Application for ' + app.pet_name)|urlencode }}&body={{ ('Hello ' + app.applicant_name + ',\n\nThank you for your interest in adopting ' + app.pet_name + '.\n\n')|urlencode }}" 
+                                               class="btn btn-primary" 
+                                               target="_blank">
+                                                📧 Contact Applicant
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-outline-secondary btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#applicationModal{{ app.application_id }}">
+                                                View Full Application
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Modal for Full Application Details -->
+                            <div class="modal fade" id="applicationModal{{ app.application_id }}" tabindex="-1" aria-labelledby="applicationModalLabel{{ app.application_id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="applicationModalLabel{{ app.application_id }}">
+                                                Adoption Application: {{ app.pet_name }}
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-4">
+                                                <h6>Applicant Information</h6>
+                                                <p><strong>Name:</strong> {{ app.applicant_name }}</p>
+                                                <p><strong>Email:</strong> <a href="mailto:{{ app.applicant_email }}">{{ app.applicant_email }}</a></p>
+                                                <p><strong>Phone:</strong> <a href="tel:{{ app.applicant_phone }}">{{ app.applicant_phone }}</a></p>
+                                                <p><strong>Submitted:</strong> {{ app.submitted_at if app.submitted_at else 'N/A' }}</p>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <h6 class="mb-3">Completion Status</h6>
+                                                {% set comp = app.completion_status if app.completion_status else {} %}
+                                                {% if comp %}
+                                                    {% set app_info = comp.get('applicant_info', {}) %}
+                                                    {% set alt_contact = comp.get('alternate_contact', {}) %}
+                                                    {% set questionnaire = comp.get('questionnaire', {}) %}
+                                                    {% set pet_care = comp.get('pet_care', {}) %}
+                                                    {% set interview = comp.get('interview', {}) %}
+                                                    {% set uploads = comp.get('uploads', {}) %}
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <h6 class="text-primary small">Applicant's Information</h6>
+                                                            <ul class="list-unstyled small">
+                                                                <li>{% if app_info.get('name') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Name</li>
+                                                                <li>{% if app_info.get('address') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Address</li>
+                                                                <li>{% if app_info.get('phone') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Phone</li>
+                                                                <li>{% if app_info.get('email') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Email</li>
+                                                                <li>{% if app_info.get('birth_date') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Birth Date</li>
+                                                                <li>{% if app_info.get('company') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Company</li>
+                                                                <li>{% if app_info.get('status') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Status</li>
+                                                                <li>{% if app_info.get('pronouns') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Pronouns</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h6 class="text-primary small">Alternate Contact</h6>
+                                                            <ul class="list-unstyled small">
+                                                                <li>{% if alt_contact.get('name') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Name</li>
+                                                                <li>{% if alt_contact.get('relationship') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Relationship</li>
+                                                                <li>{% if alt_contact.get('phone') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Phone</li>
+                                                                <li>{% if alt_contact.get('email') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Email</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h6 class="text-primary small">Questionnaire</h6>
+                                                            <ul class="list-unstyled small">
+                                                                <li>{% if questionnaire.get('looking_to_adopt') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Looking to adopt</li>
+                                                                <li>{% if questionnaire.get('specific_animal') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Specific animal</li>
+                                                                <li>{% if questionnaire.get('ideal_pet') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Ideal pet description</li>
+                                                                <li>{% if questionnaire.get('building_type') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Building type</li>
+                                                                <li>{% if questionnaire.get('do_rent') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Do you rent</li>
+                                                                <li>{% if questionnaire.get('pet_if_move') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Pet if/when you move</li>
+                                                                <li>{% if questionnaire.get('live_with') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Who you live with</li>
+                                                                <li>{% if questionnaire.get('household_allergic') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Household allergic</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h6 class="text-primary small">Pet Care Information</h6>
+                                                            <ul class="list-unstyled small">
+                                                                <li>{% if pet_care.get('care_responsible') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Care responsible</li>
+                                                                <li>{% if pet_care.get('financial_responsible') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Financial responsible</li>
+                                                                <li>{% if pet_care.get('emergency_care') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Emergency care</li>
+                                                                <li>{% if pet_care.get('hours_alone') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Hours alone</li>
+                                                                <li>{% if pet_care.get('introduction_steps') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Introduction steps</li>
+                                                                <li>{% if pet_care.get('family_support') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Family support</li>
+                                                                <li>{% if pet_care.get('has_other_pets') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Has other pets</li>
+                                                                <li>{% if pet_care.get('had_pets_past') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Had pets in past</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h6 class="text-primary small">Interview & Visitation</h6>
+                                                            <ul class="list-unstyled small">
+                                                                <li>{% if interview.get('zoom_date') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Zoom interview date</li>
+                                                                <li>{% if interview.get('zoom_time') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Zoom interview time</li>
+                                                                <li>{% if interview.get('can_visit_shelter') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Can visit shelter</li>
+                                                            </ul>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h6 class="text-primary small">Uploads</h6>
+                                                            <ul class="list-unstyled small">
+                                                                <li>{% if uploads.get('home_photos') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Home photos</li>
+                                                                <li>{% if uploads.get('valid_id') %}<span class="text-success">✓</span>{% else %}<span class="text-danger">✗</span>{% endif %} Valid ID</li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <p class="text-muted">Completion status not available</p>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <h6>Full Application Details</h6>
+                                                <pre class="bg-light p-3 rounded" style="white-space: pre-wrap; font-size: 0.9em; max-height: 400px; overflow-y: auto;">{{ app.application_details }}</pre>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ app.applicant_email|urlencode }}&su={{ ('Re: Adoption Application for ' + app.pet_name)|urlencode }}&body={{ ('Hello ' + app.applicant_name + ',\n\n')|urlencode }}" 
+                                               class="btn btn-primary btn-lg" 
+                                               target="_blank">
+                                                📧 Reply
+                                            </a>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="feature-box p-5 text-center">
+                        <h2 class="text-primary mb-3">No Adoption Applications</h2>
+                        <p class="mb-0">There are no adoption applications to review at this time.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row py-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="footer-contact">
+                        <a href="tel:(414) 857-0107" class="text-white text-decoration-none me-3">📞 (414) 857 - 0107</a>
+                        <a href="mailto:report@purrpaws.com" class="text-white text-decoration-none">📧 report@purrpaws.com</a>
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="footer-copyright">
+                        <p class="mb-0">&copy; 2025 Bantay PurrPaws. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('click', function(e){
+            const btn = e.target.closest('.profile-main-link');
+            if(btn){
+                const container = btn.closest('.profile-dropdown-container');
+                const isOpen = container.classList.toggle('open');
+                btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                e.preventDefault();
+            } else {
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+        document.addEventListener('keydown', function(e){
+            if(e.key === 'Escape'){
+                document.querySelectorAll('.profile-dropdown-container.open').forEach(c=>{
+                    c.classList.remove('open');
+                    const b = c.querySelector('.profile-main-link');
+                    if(b) b.setAttribute('aria-expanded','false');
+                });
+            }
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+

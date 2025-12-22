@@ -209,6 +209,21 @@ class Announcement(BaseModel):
 
 announcements_list: List[Announcement] = []
 
+# --- Adoption Applications ---
+class AdoptionApplication(BaseModel):
+    application_id: UUID
+    pet_id: UUID
+    pet_name: str
+    applicant_name: str
+    applicant_email: str
+    applicant_phone: str
+    application_details: str  # Full form data as formatted text
+    submitted_at: str
+    status: str = "pending"  # pending, reviewed, approved, denied
+    completion_status: dict = {}  # Track which sections/questions are filled
+
+adoption_applications: List[AdoptionApplication] = []
+
 # --- Community Stories/Reviews (user feedback) ---
 class CommunityStory(BaseModel):
     story_id: UUID
@@ -393,6 +408,34 @@ def _export_from_dict(d: dict) -> dict:
         "created_by": d.get("created_by"),
     }
 
+def _adoption_application_to_dict(app: AdoptionApplication) -> dict:
+    return {
+        "application_id": str(app.application_id),
+        "pet_id": str(app.pet_id),
+        "pet_name": app.pet_name,
+        "applicant_name": app.applicant_name,
+        "applicant_email": app.applicant_email,
+        "applicant_phone": app.applicant_phone,
+        "application_details": app.application_details,
+        "submitted_at": app.submitted_at,
+        "status": app.status,
+        "completion_status": app.completion_status if hasattr(app, 'completion_status') else {},
+    }
+
+def _adoption_application_from_dict(d: dict) -> AdoptionApplication:
+    return AdoptionApplication(
+        application_id=UUID(d["application_id"]),
+        pet_id=UUID(d["pet_id"]),
+        pet_name=d["pet_name"],
+        applicant_name=d["applicant_name"],
+        applicant_email=d["applicant_email"],
+        applicant_phone=d["applicant_phone"],
+        application_details=d["application_details"],
+        submitted_at=d["submitted_at"],
+        status=d.get("status", "pending"),
+        completion_status=d.get("completion_status", {}),
+    )
+
 
 def save_state():
     _ensure_state_dir()
@@ -408,6 +451,7 @@ def save_state():
         "community_stories": [_story_to_dict(s) for s in community_stories],
         "exports": [e for e in exports],
         "scheduled_exports": [s for s in scheduled_exports],
+        "adoption_applications": [_adoption_application_to_dict(a) for a in adoption_applications],
     }
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
@@ -415,7 +459,7 @@ def save_state():
 
 def load_state():
     global users, pending_reports, pending_pets, approved_pets, logs, notifications
-    global announcements_list, community_stories, approved_registration_history
+    global announcements_list, community_stories, approved_registration_history, adoption_applications
     if not os.path.exists(STATE_FILE):
         return
     with open(STATE_FILE, "r", encoding="utf-8") as f:
@@ -434,6 +478,8 @@ def load_state():
     approved_registration_history.clear()
     approved_registration_history.extend([_pet_from_dict(p) for p in data.get("approved_registration_history", [])])
     logs = data.get("logs", [])
+    adoption_applications.clear()
+    adoption_applications.extend([_adoption_application_from_dict(a) for a in data.get("adoption_applications", [])])
     notifications.clear()
     notifications.extend([_notification_from_dict(n) for n in data.get("notifications", [])])
     announcements_list = [_announcement_from_dict(a) for a in data.get("announcements", [])]
@@ -1288,6 +1334,60 @@ def process_adoption_application(
         if zoom_hour and zoom_minute:
             interview_time = f"{zoom_hour}:{zoom_minute} {zoom_ampm}"
         
+        # Track completion status for each section
+        completion_status = {
+            "applicant_info": {
+                "name": bool(first_name and last_name),
+                "address": bool(address),
+                "phone": bool(phone),
+                "email": bool(email),
+                "birth_date": bool(birth_date),
+                "occupation": bool(occupation),
+                "company": bool(company),
+                "social_media": bool(social_media),
+                "status": bool(status),
+                "pronouns": bool(pronouns),
+                "adoption_prompt": bool(adoption_prompt),
+                "adopted_before": bool(adopted_before),
+            },
+            "alternate_contact": {
+                "name": bool(alt_first_name and alt_last_name),
+                "relationship": bool(alt_relationship),
+                "phone": bool(alt_phone),
+                "email": bool(alt_email),
+            },
+            "questionnaire": {
+                "looking_to_adopt": bool(looking_to_adopt),
+                "specific_animal": bool(specific_animal),
+                "ideal_pet": bool(ideal_pet),
+                "building_type": bool(building_type),
+                "do_rent": bool(do_rent),
+                "pet_if_move": bool(pet_if_move),
+                "live_with": bool(live_with),
+                "household_allergic": bool(household_allergic),
+            },
+            "pet_care": {
+                "care_responsible": bool(care_responsible),
+                "financial_responsible": bool(financial_responsible),
+                "emergency_care": bool(emergency_care),
+                "hours_alone": bool(hours_alone),
+                "introduction_steps": bool(introduction_steps),
+                "family_support": bool(family_support),
+                "family_support_details": bool(family_support_details) if family_support == "no" else True,
+                "has_other_pets": bool(has_other_pets),
+                "had_pets_past": bool(had_pets_past),
+            },
+            "interview": {
+                "zoom_date": bool(zoom_interview_date),
+                "zoom_time": bool(zoom_hour and zoom_minute),
+                "can_visit_shelter": bool(can_visit_shelter),
+            },
+            "uploads": {
+                "home_photos": len(home_photos_info) > 0,
+                "valid_id": valid_id_filename != "Not provided",
+            }
+        }
+        
         # Create detailed adoption application message
         application_details = f"""
 Adoption Application Details:
@@ -1352,6 +1452,22 @@ UPLOADS:
             timestamp=datetime.now(timezone.utc).isoformat()
         )
         notifications.append(adoption_notification)
+        
+        # Store adoption application for admin review
+        global adoption_applications
+        new_application = AdoptionApplication(
+            application_id=uuid4(),
+            pet_id=pet_uuid,
+            pet_name=pet.name,
+            applicant_name=f"{first_name} {last_name}",
+            applicant_email=email,
+            applicant_phone=phone,
+            application_details=application_details,
+            submitted_at=datetime.now(timezone.utc).isoformat(),
+            status="pending",
+            completion_status=completion_status
+        )
+        adoption_applications.append(new_application)
         save_state()
         
         logs.append(f"Adoption application for '{pet.name}' from {current_user.full_name} to owner {pet.owner_user_id}")
@@ -2255,6 +2371,25 @@ def admin_unschedule_export(request: Request, job_id: str = Form(...)):
     logs.append(f"Scheduled job {job_id} removed by {current_user.email if current_user else 'unknown'}")
     return RedirectResponse(url=f"/admin/exports?status=unscheduled", status_code=HTTP_303_SEE_OTHER)
 
+
+@app.get("/admin/review-applications", tags=["Admin Panel"])
+def read_admin_review_applications(request: Request):
+    """Renders the adoption applications review page for admins."""
+    user_role, current_user = resolve_user(request)
+    if user_role != 'admin':
+        return RedirectResponse(url="/login?error=Admin access required.", status_code=HTTP_303_SEE_OTHER)
+    
+    # Sort applications by submission date (newest first)
+    sorted_applications = sorted(adoption_applications, key=lambda x: x.submitted_at, reverse=True)
+    
+    context = {
+        "request": request,
+        "user_role": user_role,
+        "current_user": current_user,
+        "applications": sorted_applications,
+        "notification_context": get_notification_context(current_user),
+    }
+    return templates.TemplateResponse("admin_review_applications.html", context)
 
 @app.get("/admin/pending", tags=["Admin Panel"])
 def read_admin_pending(request: Request):

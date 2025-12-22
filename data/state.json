@@ -290,7 +290,8 @@
     "User user@purrpaws.com deleted pet Yen.",
     "User user@purrpaws.com deleted pet Yen.",
     "User user@purrpaws.com deleted pet Max.",
-    "Registered pet 'Yen' (owner: Jessica Sales) - automatically approved and added to View Pets."
+    "Registered pet 'Yen' (owner: Jessica Sales) - automatically approved and added to View Pets.",
+    "Adoption application for 'Jessica Sales' from Jessica Sales to owner a9a23494-0743-4520-8c7d-6ce7f043e892"
   ],
   "notifications": [
     {
@@ -327,6 +328,13 @@
       "message": "Jessica Sales (xjammie143@gmail.com) is interested in adopting Max. Please contact them at xjammie143@gmail.com.",
       "read": true,
       "timestamp": "2025-12-16T18:09:49.336927+00:00"
+    },
+    {
+      "notification_id": "03d0d692-5c67-4721-8f07-0817536f65a7",
+      "user_id": "a9a23494-0743-4520-8c7d-6ce7f043e892",
+      "message": "Jessica Sales (user@purrpaws.com) has submitted an adoption application for Jessica Sales.\nAdoption Application Details:\n\nAPPLICANT'S INFORMATION:\n- Name: Jessica Sales\n- Address: Brgy. Linao, OC\n- Phone: 09205343636\n- Email: user@purrpaws.com\n- Birth Date: 2003-10-24\n- Occupation: Student\n- Company: N/a\n- Social Media: N/A\n- Status: single\n- Pronouns: she/her\n- What prompted adoption: website\n- Adopted from PAWS before: no\n\nALTERNATE CONTACT:\n- Name: John Michael Gutierrez\n- Relationship: Friend\n- Phone: 09205343636\n- Email: johnmichael@gmail.com\n\nQUESTIONNAIRE:\n- Looking to adopt: cat\n- Applying for specific animal: yes\n- Ideal pet description: Female\n- Building type: apartment\n- Do you rent: yes\n- Pet if/when you move: I'll take it with me\n- Who you live with: living_alone\n- Household allergic to animals: no\n\nPET CARE INFORMATION:\n- Care responsible: Me\n- Financial responsible: Me\n- Emergency care: My Brother\n- Hours alone: 4 hours\n- Introduction steps: Let it explore\n- Family support: yes\n- Has other pets: yes\n- Had pets in past: yes\n\nINTERVIEW & VISITATION:\n- Preferred Zoom interview date: 2026-10-24\n- Preferred Zoom interview time: 1:00 AM\n- Can visit shelter: yes\n\nUPLOADS:\n- Home photos: 1 file(s) uploaded\n- Valid ID: /static/uploads/a7aa098e-a128-4ed0-a878-b0e8967a1b28.png\n        ",
+      "read": false,
+      "timestamp": "2025-12-22T10:38:30.060320+00:00"
     }
   ],
   "announcements": [
@@ -387,6 +395,71 @@
       "frequency_minutes": 1440,
       "created_by": "c2652500-7494-4568-9e63-2a0e8450d2bf",
       "last_run": null
+    }
+  ],
+  "adoption_applications": [
+    {
+      "application_id": "29c98c94-010c-4bdd-b658-69e268ad6abe",
+      "pet_id": "2bde7fe0-4cb8-4c73-b4fb-215db9904e59",
+      "pet_name": "Jessica Sales",
+      "applicant_name": "Jessica Sales",
+      "applicant_email": "user@purrpaws.com",
+      "applicant_phone": "09205343636",
+      "application_details": "\nAdoption Application Details:\n\nAPPLICANT'S INFORMATION:\n- Name: Jessica Sales\n- Address: Brgy. Linao, OC\n- Phone: 09205343636\n- Email: user@purrpaws.com\n- Birth Date: 2003-10-24\n- Occupation: Student\n- Company: N/a\n- Social Media: N/A\n- Status: single\n- Pronouns: she/her\n- What prompted adoption: website\n- Adopted from PAWS before: no\n\nALTERNATE CONTACT:\n- Name: John Michael Gutierrez\n- Relationship: Friend\n- Phone: 09205343636\n- Email: johnmichael@gmail.com\n\nQUESTIONNAIRE:\n- Looking to adopt: cat\n- Applying for specific animal: yes\n- Ideal pet description: Female\n- Building type: apartment\n- Do you rent: yes\n- Pet if/when you move: I'll take it with me\n- Who you live with: living_alone\n- Household allergic to animals: no\n\nPET CARE INFORMATION:\n- Care responsible: Me\n- Financial responsible: Me\n- Emergency care: My Brother\n- Hours alone: 4 hours\n- Introduction steps: Let it explore\n- Family support: yes\n- Has other pets: yes\n- Had pets in past: yes\n\nINTERVIEW & VISITATION:\n- Preferred Zoom interview date: 2026-10-24\n- Preferred Zoom interview time: 1:00 AM\n- Can visit shelter: yes\n\nUPLOADS:\n- Home photos: 1 file(s) uploaded\n- Valid ID: /static/uploads/a7aa098e-a128-4ed0-a878-b0e8967a1b28.png\n        ",
+      "submitted_at": "2025-12-22T10:38:30.060388+00:00",
+      "status": "pending",
+      "completion_status": {
+        "applicant_info": {
+          "name": true,
+          "address": true,
+          "phone": true,
+          "email": true,
+          "birth_date": true,
+          "occupation": true,
+          "company": true,
+          "social_media": true,
+          "status": true,
+          "pronouns": true,
+          "adoption_prompt": true,
+          "adopted_before": true
+        },
+        "alternate_contact": {
+          "name": true,
+          "relationship": true,
+          "phone": true,
+          "email": true
+        },
+        "questionnaire": {
+          "looking_to_adopt": true,
+          "specific_animal": true,
+          "ideal_pet": true,
+          "building_type": true,
+          "do_rent": true,
+          "pet_if_move": true,
+          "live_with": true,
+          "household_allergic": true
+        },
+        "pet_care": {
+          "care_responsible": true,
+          "financial_responsible": true,
+          "emergency_care": true,
+          "hours_alone": true,
+          "introduction_steps": true,
+          "family_support": true,
+          "family_support_details": true,
+          "has_other_pets": true,
+          "had_pets_past": true
+        },
+        "interview": {
+          "zoom_date": true,
+          "zoom_time": true,
+          "can_visit_shelter": true
+        },
+        "uploads": {
+          "home_photos": true,
+          "valid_id": true
+        }
+      }
     }
   ]
 }
